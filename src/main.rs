@@ -1,3 +1,7 @@
+use clap::Parser;
+use mobius::args_parser::Cli;
+
 fn main() {
-    println!("Hello, world!");
+    let args = Cli::parse();
+    println!("Hello {:?}!", args.command);
 }
