@@ -17,7 +17,7 @@ pub struct LLM {
     pub model: String,
     pub api_key: Option<String>,
     pub url: Option<String>,
-    pub temperature: f32,
+    pub temperature: f64,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -25,13 +25,23 @@ pub struct Config {
     pub llm: LLM,
 }
 
-pub fn load_config(cfg_path: &PathBuf) -> Result<Config, Error> {
+pub fn load_config() -> Result<Config, Error> {
+    let cfg_path = get_config_path()?;
+    load_config_from(&cfg_path)
+}
+
+fn load_config_from(cfg_path: &PathBuf) -> Result<Config, Error> {
     let content = read_to_string(cfg_path)?;
     let config: Config = from_str(&content).unwrap();
     Ok(config)
 }
 
-pub fn save_config(config: &Config, cfg_path: &PathBuf) -> Result<(), Error> {
+pub fn save_config(config: &Config) -> Result<(), Error> {
+    let cfg_path = get_config_path()?;
+    save_config_to(&cfg_path, config)
+}
+
+fn save_config_to(cfg_path: &PathBuf, config: &Config) -> Result<(), Error> {
     write(cfg_path, to_string(config).unwrap())?;
     Ok(())
 }
@@ -98,8 +108,8 @@ mod tests {
             },
         };
         let tmp_cfg_file = env::temp_dir().join("config.toml");
-        save_config(&config, &tmp_cfg_file).expect("Failed to save config");
-        let loaded_config = load_config(&tmp_cfg_file).expect("Failed to load config");
+        save_config_to(&tmp_cfg_file, &config).expect("Failed to save config");
+        let loaded_config = load_config_from(&tmp_cfg_file).expect("Failed to load config");
         assert_eq!(config, loaded_config);
     }
 }
