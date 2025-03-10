@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::env;
-use std::fs::read_to_string;
 use std::fs::write;
+use std::fs::{create_dir_all, read_to_string};
 use std::io::{Error, ErrorKind};
 use std::path::PathBuf;
 use toml::{from_str, to_string};
@@ -11,18 +11,40 @@ pub enum Provider {
     OpenAi,
 }
 
+impl From<&String> for Provider {
+    fn from(s: &String) -> Self {
+        match s.as_str() {
+            "openai" => Provider::OpenAi,
+            _ => panic!("Invalid provider"),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct LLM {
     pub provider: Provider,
     pub model: String,
     pub api_key: Option<String>,
     pub url: Option<String>,
-    pub temperature: f64,
+    pub default_temperature: f64,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Config {
     pub llm: LLM,
+}
+
+pub fn default_config() -> Config {
+    let api_key = env::var("OPENAI_API_KEY").ok();
+    Config {
+        llm: LLM {
+            provider: Provider::OpenAi,
+            model: "gpt-3.5-turbo".to_string(),
+            api_key,
+            url: Some(String::from("https://api.openai.com/v1")),
+            default_temperature: 0.0,
+        },
+    }
 }
 
 pub fn load_config() -> Result<Config, Error> {
@@ -32,18 +54,22 @@ pub fn load_config() -> Result<Config, Error> {
 
 fn load_config_from(cfg_path: &PathBuf) -> Result<Config, Error> {
     let content = read_to_string(cfg_path)?;
-    let config: Config = from_str(&content).unwrap();
-    Ok(config)
+    let toml_parsing: Result<Config, toml::de::Error> = from_str(&content);
+    toml_parsing.map_err(|e| Error::new(ErrorKind::InvalidData, e))
 }
 
 pub fn save_config(config: &Config) -> Result<(), Error> {
     let cfg_path = get_config_path()?;
+    if !cfg_path.exists() {
+        if let Some(parent) = cfg_path.parent() {
+            create_dir_all(parent)?;
+        }
+    }
     save_config_to(&cfg_path, config)
 }
 
 fn save_config_to(cfg_path: &PathBuf, config: &Config) -> Result<(), Error> {
-    write(cfg_path, to_string(config).unwrap())?;
-    Ok(())
+    write(cfg_path, to_string(config).unwrap())
 }
 
 pub fn get_config_path() -> Result<PathBuf, Error> {
@@ -75,6 +101,7 @@ pub fn get_config_path() -> Result<PathBuf, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs::remove_file;
 
     #[test]
     fn test_get_config_path() {
@@ -104,10 +131,11 @@ mod tests {
                 model: "gpt-3.5-turbo".to_string(),
                 api_key: Some("test".to_string()),
                 url: None,
-                temperature: 0.7,
+                default_temperature: 0.7,
             },
         };
-        let tmp_cfg_file = env::temp_dir().join("config.toml");
+        let tmp_cfg_file = env::temp_dir().join("test_read_write_config.toml");
+        remove_file(&tmp_cfg_file).ok();
         save_config_to(&tmp_cfg_file, &config).expect("Failed to save config");
         let loaded_config = load_config_from(&tmp_cfg_file).expect("Failed to load config");
         assert_eq!(config, loaded_config);
