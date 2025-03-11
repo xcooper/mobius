@@ -1,4 +1,5 @@
 use clap::Parser;
+use log::error;
 use mobius::args_parser::{Commands, ParedArgs};
 use mobius::command::do_init;
 
@@ -10,7 +11,9 @@ fn main() {
         .unwrap();
     match args.command {
         Commands::Init { .. } => {
-            let _ = do_init(&args);
+            if let Err(e) = do_init(&args) {
+                error!("{}", e);
+            }
         }
         Commands::Pipe { .. } => {}
         Commands::AutoComplete { .. } => {}
