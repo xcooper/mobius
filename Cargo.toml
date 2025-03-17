@@ -5,8 +5,9 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.5.30", features = ["derive"] }
-reqwest = "0.12.12"
 serde = { version = "1.0.218", features = ["derive"] }
 stderrlog = "0.6.0"
 toml = "0.8.20"
 log = "0.4.25"
+async-openai = "0.28.0"
+tokio = { version = "1.44.1", features = ["full"] }

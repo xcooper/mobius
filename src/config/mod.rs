@@ -8,13 +8,13 @@ use toml::{from_str, to_string};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub enum Provider {
-    OpenAi,
+    OpenAI,
 }
 
 impl From<&String> for Provider {
     fn from(s: &String) -> Self {
         match s.as_str() {
-            "openai" => Provider::OpenAi,
+            "openai" => Provider::OpenAI,
             _ => panic!("Invalid provider"),
         }
     }
@@ -38,7 +38,7 @@ pub fn default_config() -> Config {
     let api_key = env::var("OPENAI_API_KEY").ok();
     Config {
         llm: LLM {
-            provider: Provider::OpenAi,
+            provider: Provider::OpenAI,
             model: "gpt-3.5-turbo".to_string(),
             api_key,
             url: Some(String::from("https://api.openai.com/v1")),
@@ -127,7 +127,7 @@ mod tests {
     fn test_read_write_config() {
         let config = Config {
             llm: LLM {
-                provider: Provider::OpenAi,
+                provider: Provider::OpenAI,
                 model: "gpt-3.5-turbo".to_string(),
                 api_key: Some("test".to_string()),
                 url: None,

@@ -1,8 +1,10 @@
 use crate::args_parser::{Commands, ParedArgs};
-use crate::config::{default_config, save_config, Provider};
+use crate::config::{default_config, load_config, save_config, Provider};
+use crate::llm::{get_llm, LLM};
+use crate::{echo, CommandExecutionError};
 use std::env;
-use std::error::Error;
-use std::fmt::Display;
+
+const DEF_SYS_PROMPT: &str = "You are a helpful assistant";
 
 pub fn do_init(args: &ParedArgs) -> Result<(), CommandExecutionError> {
     let cmd = &args.command;
@@ -30,21 +32,28 @@ pub fn do_init(args: &ParedArgs) -> Result<(), CommandExecutionError> {
     Ok(())
 }
 
-#[derive(Debug)]
-pub struct CommandExecutionError<'a> {
-    error_message: &'a str,
-}
-
-impl CommandExecutionError<'_> {
-    fn new(msg: &str) -> CommandExecutionError {
-        CommandExecutionError { error_message: msg }
+pub async fn do_pipe(args: &ParedArgs) -> Result<(), CommandExecutionError> {
+    let cmd = &args.command;
+    let config = load_config().map_err(|_| CommandExecutionError::new("can not load config"))?;
+    if let Commands::Pipe {
+        prompt,
+        system_prompt,
+    } = cmd
+    {
+        let llm = get_llm(&config);
+        return match llm
+            .chat(
+                &system_prompt.as_ref().map_or(DEF_SYS_PROMPT, |v| v),
+                &prompt,
+            )
+            .await
+        {
+            Ok(o) => {
+                echo!(o);
+                Ok(())
+            }
+            Err(e) => Err(CommandExecutionError::from_string(format!("{:?}", e))),
+        };
     }
-}
-
-impl Error for CommandExecutionError<'_> {}
-
-impl Display for CommandExecutionError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "command exec with error: {}", self.error_message)
-    }
+    Err(CommandExecutionError::new("invalid command"))
 }

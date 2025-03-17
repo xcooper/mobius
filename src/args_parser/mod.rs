@@ -33,8 +33,10 @@ pub enum Commands {
         about = "Sends the prompt along with the stdin to AI"
     )]
     Pipe {
-        #[arg(short, long)]
+        #[arg(short, long, help = "The prompt talking to AI")]
         prompt: String,
+        #[arg(short, long, help = "The system prompt talking to AI")]
+        system_prompt: Option<String>,
     },
     #[command(arg_required_else_help = true)]
     AutoComplete {
