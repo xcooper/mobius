@@ -4,8 +4,7 @@ use async_openai::config::OpenAIConfig;
 use async_openai::types::{
     ChatCompletionRequestMessage, ChatCompletionRequestSystemMessage,
     ChatCompletionRequestSystemMessageContent, ChatCompletionRequestUserMessage,
-    ChatCompletionRequestUserMessageContent, ChatCompletionRequestUserMessageContentPart,
-    CreateChatCompletionRequestArgs,
+    ChatCompletionRequestUserMessageContent, CreateChatCompletionRequestArgs,
 };
 use async_openai::Client;
 
@@ -32,24 +31,27 @@ impl<'a> OpenAI<'a> {
 }
 
 impl LLM for OpenAI<'_> {
-    async fn chat(&self, system_prompt: &str, prompt: &str) -> Result<String, Box<dyn Error>> {
+    async fn chat(&self, system_prompt: &str, user_prompt: &str) -> Result<String, Box<dyn Error>> {
+        let mut prompts: Vec<ChatCompletionRequestMessage> = Vec::new();
+        prompts.push(ChatCompletionRequestMessage::System(
+            ChatCompletionRequestSystemMessage {
+                content: ChatCompletionRequestSystemMessageContent::Text(system_prompt.to_string()),
+                name: None,
+            },
+        ));
+        prompts.push(ChatCompletionRequestMessage::User(
+            ChatCompletionRequestUserMessage {
+                content: ChatCompletionRequestUserMessageContent::Text(user_prompt.to_string()),
+                name: None,
+            },
+        ));
+
         let req = CreateChatCompletionRequestArgs::default()
             .model(self.config.llm.model.clone())
-            .messages(vec![
-                ChatCompletionRequestMessage::System(ChatCompletionRequestSystemMessage {
-                    content: ChatCompletionRequestSystemMessageContent::Text(
-                        system_prompt.to_string(),
-                    ),
-                    name: None,
-                }),
-                ChatCompletionRequestMessage::User(ChatCompletionRequestUserMessage {
-                    content: ChatCompletionRequestUserMessageContent::Text(prompt.to_string()),
-                    name: None,
-                }),
-            ])
+            .temperature(0.0)
+            .messages(prompts)
             .build()
             .unwrap();
-
         let resp = self.client.chat().create(req).await;
 
         if let Ok(r) = resp {

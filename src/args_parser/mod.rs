@@ -33,9 +33,9 @@ pub enum Commands {
         about = "Sends the prompt along with the stdin to AI"
     )]
     Pipe {
-        #[arg(short, long, help = "The prompt talking to AI")]
+        #[arg(short, long, help = "The prompt, use '-' for reading from stdin")]
         prompt: String,
-        #[arg(short, long, help = "The system prompt talking to AI")]
+        #[arg(short, long, help = "The system prompt")]
         system_prompt: Option<String>,
     },
     #[command(arg_required_else_help = true)]
