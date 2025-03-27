@@ -80,7 +80,8 @@ pub fn get_config_path() -> Result<PathBuf, Error> {
             if let Ok(cfg_path) = xdg_cfg_home {
                 Ok(PathBuf::from(cfg_path).join("mobius/config.toml"))
             } else {
-                Ok(PathBuf::from("~/.config/mobius/config.toml"))
+                let home = env::var("HOME").unwrap();
+                Ok(PathBuf::from(home).join(".config/mobius/config.toml"))
             }
         }
         "windows" => {

@@ -66,15 +66,15 @@ pub async fn do_pipe(args: &ParedArgs) -> Result<(), CommandExecutionError> {
 
 fn default_sys_prompt() -> String {
     match env::consts::OS {
-        "linux" => "Be a Linux shell command assistant, only response with command, no wrapping, be concise."
+        "linux" => "Be a Linux shell command assistant, only response with command, no wrapping quotes, be concise."
             .to_string(),
         "macos" => {
-            "Be a Zsh command assistant, only response with command, no wrapping, be concise.".to_string()
+            "Be a Zsh command assistant, only response with command, no wrapping quotes, be concise.".to_string()
         }
         "windows" => {
             "Be a Windows power shell assistant, only response with command, no wrapping quotes, be concise."
                 .to_string()
         }
-        _ => "Be a shell command assistant, only response with command, no wrapping, be concise.".to_string(),
+        _ => "Be a shell command assistant, only response with command, no wrapping quotes, be concise.".to_string(),
     }
 }
