@@ -1,11 +1,11 @@
 use clap::Parser;
 use log::error;
-use mobius::args_parser::{Commands, ParedArgs};
-use mobius::command::{do_init, do_pipe};
+use mobius::args_parser::{Commands, ParsedArgs};
+use mobius::command::{do_autocomplete, do_init, do_pipe};
 
 #[tokio::main]
 async fn main() {
-    let args = ParedArgs::parse();
+    let args = ParsedArgs::parse();
     stderrlog::new()
         .verbosity(args.verbose as usize)
         .init()
@@ -21,6 +21,10 @@ async fn main() {
                 error!("{}", e);
             }
         }
-        Commands::AutoComplete { .. } => {}
+        Commands::AutoComplete { .. } => {
+            if let Err(e) = do_autocomplete(&args).await {
+                error!("{}", e);
+            }
+        }
     }
 }

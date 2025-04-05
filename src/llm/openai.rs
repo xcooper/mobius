@@ -48,7 +48,7 @@ impl LLM for OpenAI<'_> {
 
         let req = CreateChatCompletionRequestArgs::default()
             .model(self.config.llm.model.clone())
-            .temperature(0.0)
+            .temperature(self.config.llm.default_temperature as f32)
             .messages(prompts)
             .build()
             .unwrap();

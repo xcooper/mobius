@@ -3,9 +3,14 @@ mod openai;
 use crate::config::{Config, Provider};
 use crate::llm::openai::OpenAI;
 use std::error::Error;
+use std::future::Future;
 
 pub trait LLM {
-    async fn chat(&self, system_prompt: &str, user_prompt: &str) -> Result<String, Box<dyn Error>>;
+    fn chat(
+        &self,
+        system_prompt: &str,
+        user_prompt: &str,
+    ) -> impl Future<Output = Result<String, Box<dyn Error>>> + Send;
 }
 
 pub fn get_llm<'a>(config: &'a Config) -> impl LLM + 'a {

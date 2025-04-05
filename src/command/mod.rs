@@ -1,11 +1,11 @@
-use crate::args_parser::{Commands, ParedArgs};
+use crate::args_parser::{Commands, ParsedArgs};
 use crate::config::{default_config, load_config, save_config, Provider};
 use crate::llm::{get_llm, LLM};
 use crate::{echo, CommandExecutionError};
 use std::env;
 use std::io::{stdin, Read};
 
-pub fn do_init(args: &ParedArgs) -> Result<(), CommandExecutionError> {
+pub fn do_init(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
     let cmd = &args.command;
     if let Commands::Init {
         api_key,
@@ -31,7 +31,7 @@ pub fn do_init(args: &ParedArgs) -> Result<(), CommandExecutionError> {
     Ok(())
 }
 
-pub async fn do_pipe(args: &ParedArgs) -> Result<(), CommandExecutionError> {
+pub async fn do_pipe(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
     let cmd = &args.command;
     let config = load_config().map_err(|_| CommandExecutionError::new("can not load config"))?;
     if let Commands::Pipe {
@@ -54,6 +54,24 @@ pub async fn do_pipe(args: &ParedArgs) -> Result<(), CommandExecutionError> {
             )
             .await
         {
+            Ok(o) => {
+                echo!(o);
+                Ok(())
+            }
+            Err(e) => Err(CommandExecutionError::from_string(format!("{:?}", e))),
+        };
+    }
+    Err(CommandExecutionError::new("invalid command"))
+}
+
+pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
+    let cmd = &args.command;
+    if let Commands::AutoComplete { prompt } = cmd {
+        let user_prompt = prompt;
+        let config =
+            load_config().map_err(|_| CommandExecutionError::new("can not load config"))?;
+        let llm = get_llm(&config);
+        return match llm.chat(&default_sys_prompt(), user_prompt).await {
             Ok(o) => {
                 echo!(o);
                 Ok(())

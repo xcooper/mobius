@@ -5,7 +5,7 @@ use clap::Subcommand;
 
 #[derive(Parser, Debug)]
 #[command(about="A CLI for integrating with AI.", long_about=None)]
-pub struct ParedArgs {
+pub struct ParsedArgs {
     #[command(subcommand)]
     pub command: Commands,
     #[arg(short, long, action = ArgAction::Count, help = "Print debug information")]
