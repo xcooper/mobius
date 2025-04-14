@@ -1,3 +1,4 @@
+use clap::ValueEnum;
 use clap::command;
 use clap::ArgAction;
 use clap::Parser;
@@ -38,9 +39,19 @@ pub enum Commands {
         #[arg(short, long, help = "The system prompt")]
         system_prompt: Option<String>,
     },
-    #[command(hide = true)]
+    #[command(
+        arg_required_else_help = false,
+    )]
     AutoComplete {
         #[arg(short, long)]
-        shell: Option<String>,
+        shell: Option<Shell>,
     },
+}
+
+
+#[derive(Debug, Clone, ValueEnum, PartialEq)]
+pub enum Shell {
+    Zsh,
+    Bash,
+    PowerShell,
 }

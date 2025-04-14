@@ -4,11 +4,18 @@ A tool brings command line and AI models together.
 
 ## Features
 
-- [ ] Let AI processing the input and produce meaningful output
-- [ ] Ask AI generating a command based your prompt
+- [V] Let AI processing the input and produce meaningful output
+- [V] Ask AI generating a command based your prompt
 - [ ] Call other commands based on AI response
 - [ ] Manage prompts
 - [ ] Trigger AI generating a command using auto-complete(Tab key)
+  - [V] Windows PowerShell
+  - [V] Linux ZSH
+  - [V] Linux BASH
+  - [ ] MAC ZSH
+- [ ] Support more LLM
+  - [V] OpenAI
+  - [ ] Gemini
 
 ## Get Started
 

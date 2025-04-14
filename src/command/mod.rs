@@ -1,4 +1,4 @@
-use crate::args_parser::{Commands, ParsedArgs};
+use crate::args_parser::{Commands, ParsedArgs, Shell};
 use crate::config::{default_config, load_config, save_config, Provider};
 use crate::llm::{get_llm, LLM};
 use crate::{echo, CommandExecutionError};
@@ -65,6 +65,34 @@ pub async fn do_pipe(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
 }
 
 pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
+    if let Commands::AutoComplete { shell } = &args.command {
+        return match env::consts::OS {
+            "linux" => {
+                if let Some(s) = shell {
+                    return if s == &Shell::Bash {
+                        echo!(include_str!("../../scripts/bash_autocomplete.bash"));
+                        Ok(())
+                    } else if s == &Shell::Zsh {
+                        echo!(include_str!("../../scripts/zsh_autocomplete.zsh"));
+                        Ok(())
+                    } else {
+                        Err(CommandExecutionError::new("Must specify shell"))
+                    }
+                } else {
+                    Err(CommandExecutionError::new("Unsupported Platform"))
+                }
+            },
+            "macos" => {
+                echo!(include_str!("../../scripts/zsh_autocomplete.zsh"));
+                Ok(())
+            },
+            "windows" => {
+                echo!(include_str!("../../scripts/pwsh_autocomplete.ps1"));
+                Ok(())
+            },
+            _ => Err(CommandExecutionError::new("Unsupported Platform"))
+        }
+    }
     Err(CommandExecutionError::new("invalid command"))
 }
 
