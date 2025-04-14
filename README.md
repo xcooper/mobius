@@ -4,17 +4,17 @@ A tool brings command line and AI models together.
 
 ## Features
 
-- [V] Let AI processing the input and produce meaningful output
-- [V] Ask AI generating a command based your prompt
+- [X] Let AI processing the input and produce meaningful output
+- [X] Ask AI generating a command based your prompt
 - [ ] Call other commands based on AI response
 - [ ] Manage prompts
 - [ ] Trigger AI generating a command using auto-complete(Tab key)
-  - [V] Windows PowerShell
-  - [V] Linux ZSH
-  - [V] Linux BASH
+  - [X] Windows PowerShell
+  - [X] Linux ZSH
+  - [X] Linux BASH
   - [ ] MAC ZSH
 - [ ] Support more LLM
-  - [V] OpenAI
+  - [X] OpenAI
   - [ ] Gemini
 
 ## Get Started
@@ -41,13 +41,15 @@ Invoke-Expression -Command (mobius auto-complete --shell power-shell | Out-Strin
 ### Linux
 Edit the shell init file based on your shell.
 
-**BASH**
+```bash
+# add this to .bashrc
+source <(mobius auto-complete --shell bash)
+```
 
-Add `source <(mobius auto-complete --shell bash)` to `.bashrc`.
-
-**ZSH**
-
-Add `source <(mobius auto-complete --shell zsh)` to `.zshrc`.
+```bash
+# add this to .zshrc
+source <(mobius auto-complete --shell zsh)
+```
 
 ## Commands
 
@@ -57,8 +59,7 @@ Add `source <(mobius auto-complete --shell zsh)` to `.zshrc`.
 mobius init --provider open-ai --model gpt-3.5-turbo --api-key ...
 ```
 
-This is a simple command only initialize some configurations.  Including,
-* The configurations for using AI
+This is a simple command only initialize some configurations.
 
 ### Chat
 
