@@ -29,32 +29,46 @@ Firstly, you need to configure **Mobius**.
 The configuration file honor the standard location based on your OS.
 `mobius init` will generate the default configuration and save to the default location.
 
+If you want to enable *AutoComplete*, you need to execute **Mobius** in your shell init config.
+
+### Windows
+Edit the PowerShell config `$PROFILE`, add following line in the file.
+
+```powershell
+Invoke-Expression -Command (mobius auto-complete --shell power-shell | Out-String)
+```
+
+### Linux
+Edit the shell init file based on your shell.
+
+**BASH**
+
+Add `source <(mobius auto-complete --shell bash)` to `.bashrc`.
+
+**ZSH**
+
+Add `source <(mobius auto-complete --shell zsh)` to `.zshrc`.
+
 ## Commands
 
-### Init(TODO)
+### Init
 
 ```shell
-mobius init
+mobius init --provider open-ai --model gpt-3.5-turbo --api-key ...
 ```
 
 This is a simple command only initialize some configurations.  Including,
 * The configurations for using AI
 
-### Pipe(TODO)
+### Chat
 
 ```shell
-cat Main.java | mobius pipe --llm openai --prompt "rewrite the Java code in Rust" | tee main.rs
-```
-
-This command sends the prompt with the stdin to AI and returns the result.
-
-```shell
-cat data.csv | mobius pipe --prompt-file ./csv-to-json-prompt.txt | jq '.name'
+cat Main.java | mobius chat --prompt "rewrite the Java code in Rust" | tee main.rs
 ```
 
 Also supports reading prompts from files.
 
-### Complete(TODO)
+### Shell Auto Complete
 
 Like most auto-complete functions, this command meant to be triggered on <tab> key with a special 
 prefix `ai:` on your command line.
@@ -75,14 +89,3 @@ The config file will be one of the following locations.
   * `$XDG_CONFIG_HOME/mobius/config.toml` (default `~/.config/mobius/config.toml`)
 * Windows
   * `%APPDATA%\mobius\config.toml`
-
-### Config Structure
-
-The example of configuration is
-
-```toml
-[llm]
-provider="openai"
-model="gpt-4o-2024-08-06"
-api_key="<openai api key>"
-```

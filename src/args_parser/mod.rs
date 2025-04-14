@@ -18,18 +18,17 @@ pub struct ParsedArgs {
 pub enum Commands {
     #[command(arg_required_else_help = false, about = "Initialize configurations")]
     Init {
-        #[arg(short, long, default_value = "openai", help = "The AI provider to use")]
+        #[arg(short, long, help = "The AI provider to use")]
         provider: Provider,
         #[arg(
             short,
             long,
-            default_value = "gpt-3.5-turbo",
-            help = "The AI model to use"
+            help = "The AI model to use, e.g., gpt-4o"
         )]
         model: String,
         #[arg(short, long, help = "The API key for accessing the AI provider")]
         api_key: Option<String>,
-        #[arg(long, help = "The URL for accessing the AI provider")]
+        #[arg(long, help = "The URL for accessing the AI provider, only need by in-house LLMs.")]
         llm_url: Option<String>,
     },
     #[command(
