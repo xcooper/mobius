@@ -25,12 +25,7 @@ pub fn do_init(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
         }
         if let Some(key) = api_key {
             new_config.llm.api_key = Some(key.clone());
-        } else if let Ok(key) = env::var("OPENAI_API_KEY") {
-            new_config.llm.api_key = Some(key);
-        } else {
-            return Err(CommandExecutionError::new("No API key found. Please provide one using --api-key or set OPENAI_API_KEY environment variable."));
         }
-
         if let Err(_) = save_config(&new_config) {
             return Err(CommandExecutionError::new("Failed to save config"));
         }

@@ -13,20 +13,24 @@ use crate::llm::LLM;
 use crate::CommandExecutionError;
 
 pub struct OpenAI<'a> {
-    client: Client<OpenAIConfig>,
     config: &'a Config,
 }
 
 impl<'a> OpenAI<'a> {
     pub fn new(config: &'a Config) -> Self {
-        let mut open_ai = Self {
-            client: Client::new(),
+        Self {
             config,
-        };
-        let api_key = config.llm.api_key.as_deref().unwrap();
+        }
+    }
+
+    fn init_client(&self) -> Result<Client<OpenAIConfig>, CommandExecutionError> {
+        if self.config.llm.api_key.is_none() {
+            return Err(CommandExecutionError::new("The API key of OpenAI is missing."));
+        }
+        let api_key = self.config.llm.api_key.as_deref().unwrap();
         let oai_cfg = OpenAIConfig::new().with_api_key(api_key);
-        open_ai.client = Client::with_config(oai_cfg);
-        open_ai
+        let client = Client::with_config(oai_cfg);
+        Ok(client)
     }
 }
 
@@ -52,8 +56,8 @@ impl LLM for OpenAI<'_> {
             .messages(prompts)
             .build()
             .unwrap();
-        let resp = self.client.chat().create(req).await;
-
+        let client = self.init_client()?;
+        let resp = client.chat().create(req).await;
         if let Ok(r) = resp {
             if let Some(choice) = r.choices.first() {
                 return match &choice.message.content {
