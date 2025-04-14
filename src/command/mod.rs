@@ -99,16 +99,5 @@ pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionEr
 }
 
 fn default_sys_prompt() -> String {
-    match env::consts::OS {
-        "linux" => "Be a Linux shell command assistant, only response with command, no wrapping quotes, be concise."
-            .to_string(),
-        "macos" => {
-            "Be a Zsh command assistant, only response with command, no wrapping quotes, be concise.".to_string()
-        }
-        "windows" => {
-            "Be a Windows power shell assistant, only response with command, no wrapping quotes, be concise."
-                .to_string()
-        }
-        _ => "Be a shell command assistant, only response with command, no wrapping quotes, be concise.".to_string(),
-    }
+    String::from("You are a good assistant, the response should be concise.")
 }

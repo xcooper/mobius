@@ -44,6 +44,7 @@ pub enum Commands {
     },
     #[command(
         arg_required_else_help = false,
+        about = "Generate CLI auto-complete script based on the OS and the shell"
     )]
     AutoComplete {
         #[arg(short, long)]
