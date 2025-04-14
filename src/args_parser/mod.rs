@@ -33,7 +33,7 @@ pub enum Commands {
         arg_required_else_help = true,
         about = "Sends the prompt along with the stdin to AI"
     )]
-    Pipe {
+    Chat {
         #[arg(short, long, help = "The prompt, use '-' for reading from stdin")]
         prompt: String,
         #[arg(short, long, help = "The system prompt")]

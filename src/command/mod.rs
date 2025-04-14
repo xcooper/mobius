@@ -31,10 +31,10 @@ pub fn do_init(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
     Ok(())
 }
 
-pub async fn do_pipe(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
+pub async fn do_chat(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
     let cmd = &args.command;
     let config = load_config().map_err(|_| CommandExecutionError::new("can not load config"))?;
-    if let Commands::Pipe {
+    if let Commands::Chat {
         prompt,
         system_prompt,
     } = cmd
