@@ -28,7 +28,7 @@ pub fn default_config() -> Config {
             provider: Provider::OpenAI,
             model: "gpt-3.5-turbo".to_string(),
             api_key,
-            url: Some(String::from("https://api.openai.com/v1")),
+            url: None,
             default_temperature: 0.0,
         },
     }

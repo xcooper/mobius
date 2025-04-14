@@ -1,7 +1,7 @@
 use crate::args_parser::{Commands, ParsedArgs};
 use crate::config::{default_config, load_config, save_config};
-use crate::llm::{get_llm, LLM};
-use crate::model::{Shell, Provider};
+use crate::llm::{get_llm, get_llm_url, LLM};
+use crate::model::Shell;
 use crate::{echo, CommandExecutionError};
 use std::env;
 use std::io::{stdin, Read};
@@ -10,13 +10,19 @@ pub fn do_init(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
     let cmd = &args.command;
     if let Commands::Init {
         api_key,
+        llm_url,
         model,
         provider,
     } = cmd
     {
         let mut new_config = default_config();
-        new_config.llm.provider = Provider::from(provider);
+        new_config.llm.provider = provider.clone();
         new_config.llm.model = model.clone();
+        if let Some(u) = llm_url {
+            new_config.llm.url = Some(u.clone());
+        } else {
+            new_config.llm.url = get_llm_url(&new_config.llm.provider);
+        }
         if let Some(key) = api_key {
             new_config.llm.api_key = Some(key.clone());
         } else if let Ok(key) = env::var("OPENAI_API_KEY") {

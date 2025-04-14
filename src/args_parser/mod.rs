@@ -2,6 +2,7 @@ use clap::command;
 use clap::ArgAction;
 use clap::Parser;
 use clap::Subcommand;
+use crate::model::Provider;
 use crate::model::Shell;
 
 #[derive(Parser, Debug)]
@@ -18,7 +19,7 @@ pub enum Commands {
     #[command(arg_required_else_help = false, about = "Initialize configurations")]
     Init {
         #[arg(short, long, default_value = "openai", help = "The AI provider to use")]
-        provider: String,
+        provider: Provider,
         #[arg(
             short,
             long,
@@ -28,6 +29,8 @@ pub enum Commands {
         model: String,
         #[arg(short, long, help = "The API key for accessing the AI provider")]
         api_key: Option<String>,
+        #[arg(long, help = "The URL for accessing the AI provider")]
+        llm_url: Option<String>,
     },
     #[command(
         arg_required_else_help = true,

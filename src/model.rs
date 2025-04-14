@@ -12,12 +12,3 @@ pub enum Shell {
 pub enum Provider {
     OpenAI,
 }
-
-impl From<&String> for Provider {
-    fn from(s: &String) -> Self {
-        match s.as_str() {
-            "openai" => Provider::OpenAI,
-            _ => panic!("Invalid provider"),
-        }
-    }
-}

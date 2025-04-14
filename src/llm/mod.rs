@@ -20,3 +20,9 @@ pub fn get_llm<'a>(config: &'a Config) -> impl LLM + 'a {
         Provider::OpenAI => OpenAI::new(config),
     }
 }
+
+pub fn get_llm_url(provider: &Provider) -> Option<String> {
+    match provider {
+        Provider::OpenAI => Some(String::from("https://api.openai.com/v1")),
+    }
+}
