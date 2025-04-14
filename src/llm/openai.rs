@@ -57,16 +57,14 @@ impl LLM for OpenAI<'_> {
             .build()
             .unwrap();
         let client = self.init_client()?;
-        let resp = client.chat().create(req).await;
-        if let Ok(r) = resp {
-            if let Some(choice) = r.choices.first() {
-                return match &choice.message.content {
-                    Some(content) => Ok(content.clone()),
-                    None => Err(Box::new(CommandExecutionError::new(
-                        "no content in response",
-                    ))),
-                };
-            }
+        let resp = client.chat().create(req).await?;
+        if let Some(choice) = resp.choices.first() {
+            return match &choice.message.content {
+                Some(content) => Ok(content.clone()),
+                None => Err(Box::new(CommandExecutionError::new(
+                    "no content in response",
+                ))),
+            };
         }
         Err(Box::new(CommandExecutionError::new(
             "error in OpenAI response.",
