@@ -4,6 +4,7 @@ pub mod args_parser;
 pub mod command;
 pub mod config;
 pub mod llm;
+pub mod model;
 
 macro_rules! echo {
     ($arg:expr) => {

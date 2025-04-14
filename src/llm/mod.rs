@@ -1,6 +1,7 @@
 mod openai;
 
-use crate::config::{Config, Provider};
+use crate::model::Provider;
+use crate::config::Config;
 use crate::llm::openai::OpenAI;
 use std::error::Error;
 use std::future::Future;

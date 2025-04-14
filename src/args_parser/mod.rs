@@ -1,8 +1,8 @@
-use clap::ValueEnum;
 use clap::command;
 use clap::ArgAction;
 use clap::Parser;
 use clap::Subcommand;
+use crate::model::Shell;
 
 #[derive(Parser, Debug)]
 #[command(about="A CLI for integrating with AI.", long_about=None)]
@@ -46,12 +46,4 @@ pub enum Commands {
         #[arg(short, long)]
         shell: Option<Shell>,
     },
-}
-
-
-#[derive(Debug, Clone, ValueEnum, PartialEq)]
-pub enum Shell {
-    Zsh,
-    Bash,
-    PowerShell,
 }

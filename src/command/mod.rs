@@ -1,6 +1,7 @@
-use crate::args_parser::{Commands, ParsedArgs, Shell};
-use crate::config::{default_config, load_config, save_config, Provider};
+use crate::args_parser::{Commands, ParsedArgs};
+use crate::config::{default_config, load_config, save_config};
 use crate::llm::{get_llm, LLM};
+use crate::model::{Shell, Provider};
 use crate::{echo, CommandExecutionError};
 use std::env;
 use std::io::{stdin, Read};

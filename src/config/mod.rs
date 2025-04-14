@@ -1,24 +1,11 @@
 use serde::{Deserialize, Serialize};
+use crate::model::Provider;
 use std::env;
 use std::fs::write;
 use std::fs::{create_dir_all, read_to_string};
 use std::io::{Error, ErrorKind};
 use std::path::PathBuf;
 use toml::{from_str, to_string};
-
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub enum Provider {
-    OpenAI,
-}
-
-impl From<&String> for Provider {
-    fn from(s: &String) -> Self {
-        match s.as_str() {
-            "openai" => Provider::OpenAI,
-            _ => panic!("Invalid provider"),
-        }
-    }
-}
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct LLM {
