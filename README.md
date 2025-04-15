@@ -12,7 +12,7 @@ If you want to enable *AutoComplete*, you also need to execute **Mobius** in you
 
 ### Windows
 
-Edit the PowerShell config `$PROFILE` (e.g., C:\Users\username\Document\PowerShell\Microsoft.PowerShell_profile.ps1), add following line in the file.
+Edit the PowerShell config `$PROFILE` (e.g., `C:\Users\username\Document\PowerShell\Microsoft.PowerShell_profile.ps1`), add following line in the file.
 
 ```powershell
 Invoke-Expression -Command (mobius auto-complete --shell power-shell | Out-String)
@@ -62,10 +62,9 @@ Options:
 
 ### Shell Auto Complete
 
-Like most auto-complete functions, this command meant to be triggered by `TAB` key with a special 
-prefix `ai:` on your command line.
+Like most auto-complete functions, this command meant to be triggered by `TAB` key with a special prefix `ai:` on your command line.  The returned commands from AI will consider the OS you are running.
 
-The returned commands from AI will consider the OS you are running.
+See the "Get Started" section for the usage.
 
 ```
 Usage: mobius.exe auto-complete [OPTIONS]
