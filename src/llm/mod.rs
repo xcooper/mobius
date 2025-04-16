@@ -1,4 +1,5 @@
 mod openai;
+mod gemini;
 
 use crate::model::Provider;
 use crate::config::Config;

@@ -11,7 +11,7 @@ _mobius_completer() {
         local after_ai="${line_before_cursor#*ai:}"
         
         # Run the mobius command with the text after "ai:"
-        local ai_resp=$(mobius chat --prompt "$after_ai" --system-prompt "Be a Linux shell command assistant, only response with command, no wrapping quotes, be concise.")
+        local ai_resp=$(mobius chat --prompt "$after_ai" --system-prompt "Be a Linux shell command assistant, only response with command, no wrappers, be concise.")
         
         # Reconstruct the command line
         READLINE_LINE="${before_ai}${ai_resp}${READLINE_LINE:$READLINE_POINT}"
