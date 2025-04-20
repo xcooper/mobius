@@ -1,9 +1,11 @@
-mod openai;
 mod gemini;
+mod openai;
 
-use crate::model::Provider;
+use gemini::Gemini;
+
 use crate::config::Config;
 use crate::llm::openai::OpenAI;
+use crate::model::Provider;
 use std::error::Error;
 use std::future::Future;
 
@@ -18,12 +20,14 @@ pub trait LLM {
 pub fn get_llm<'a>(config: &'a Config) -> impl LLM + 'a {
     let provider = &config.llm.provider;
     match provider {
-        Provider::OpenAI => OpenAI::new(config),
+        Provider::OpenAI => Box::new(OpenAI::new(config)),
+        Provider::Gemini => Box::new(Gemini::new(config)),
     }
 }
 
 pub fn get_llm_url(provider: &Provider) -> Option<String> {
     match provider {
         Provider::OpenAI => Some(String::from("https://api.openai.com/v1")),
+        Provider::Gemini => Some(String::from("https://api.openai.com/v1")),
     }
 }

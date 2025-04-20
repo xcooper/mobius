@@ -11,4 +11,4 @@ toml = "0.8.20"
 log = "0.4.25"
 async-openai = "0.28.0"
 tokio = { version = "1.44.1", features = ["full"] }
-gemini-ai = { version = "0.1.1682", features = ["async"] }
+reqwest = { version = "0.12.15", features = ["json"] }

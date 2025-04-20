@@ -11,4 +11,5 @@ pub enum Shell {
 #[derive(Serialize, Deserialize, Debug, Clone, ValueEnum, PartialEq)]
 pub enum Provider {
     OpenAI,
+    Gemini,
 }

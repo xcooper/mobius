@@ -1,18 +1,20 @@
 # MOBIUS
 
-A tool brings command line and AI models together.
+A tool that integrates command-line interfaces with AI models.
 
 ## Get Started
 
-Download the executable based on your OS.  Put it on a directory within the PATH.
+Download the executable for your OS and place it in a directory included in your PATH.
 
-Next, `mobius init` will help to set the configurations and save to the default location.
+Run `mobius init` to configure the tool and save the settings to the default location.
 
-If you want to enable *AutoComplete*, you also need to execute **Mobius** in your shell init config.  Here are the instructions for different platforms.
+To enable *AutoComplete*, add **Mobius** to your shell initialization file. Instructions for different platforms are
+below:
 
 ### Windows
 
-Edit the PowerShell config `$PROFILE` (e.g., `C:\Users\username\Document\PowerShell\Microsoft.PowerShell_profile.ps1`), add following line in the file.
+Edit your PowerShell profile `$PROFILE` (e.g.,
+`C:\Users\username\Documents\PowerShell\Microsoft.PowerShell_profile.ps1`) and add:
 
 ```powershell
 Invoke-Expression -Command (mobius auto-complete --shell power-shell | Out-String)
@@ -20,15 +22,15 @@ Invoke-Expression -Command (mobius auto-complete --shell power-shell | Out-Strin
 
 ### Linux
 
-Edit the shell init file based on your shell.
+Edit the shell initialization file for your shell:
 
 ```bash
-# add this to .bashrc
+# For Bash, add this to .bashrc
 source <(mobius auto-complete --shell bash)
 ```
 
 ```bash
-# add this to .zshrc
+# For Zsh, add this to .zshrc
 source <(mobius auto-complete --shell zsh)
 ```
 
@@ -36,7 +38,7 @@ source <(mobius auto-complete --shell zsh)
 
 ### Init
 
-Set initial configurations.
+Set up initial configurations.
 
 ```
 Usage: mobius.exe init [OPTIONS] --provider <PROVIDER> --model <MODEL>
@@ -50,7 +52,7 @@ Options:
 
 ### Chat
 
-Talk to the LLM with prompts and print out the response to the stdout.
+Interact with the LLM using prompts and display the response in the terminal.
 
 ```
 Usage: mobius.exe chat [OPTIONS] --prompt <PROMPT>
@@ -62,9 +64,10 @@ Options:
 
 ### Shell Auto Complete
 
-Like most auto-complete functions, this command meant to be triggered by `TAB` key with a special prefix `ai:` on your command line.  The returned commands from AI will consider the OS you are running.
+Enable AI-powered auto-completion triggered by the `TAB` key with the prefix `ai:`. The AI-generated commands will
+consider your operating system.
 
-See the "Get Started" section for the usage.
+Refer to the "Get Started" section for setup instructions.
 
 ```
 Usage: mobius.exe auto-complete [OPTIONS]
@@ -73,19 +76,19 @@ Options:
   -s, --shell <SHELL>  [possible values: zsh, bash, power-shell]
 ```
 
-For example, `ai:find foobar in all files`, AI will properly return `grep -R foobar` on Linux.
+Example: Typing `ai:find foobar in all files` will return `grep -R foobar` on Linux.
 
-> Note: The returned commands are based on public knowledges, you need to confirm them before you pressing ENTER.
+> Note: The AI-generated commands are based on public knowledge. Verify them before pressing ENTER.
 
 ## Config File
 
 ### Location
 
-The config file will be one of the following locations.
+The configuration file is located in one of the following paths:
 
-* Linux & Mac
-  * `$XDG_CONFIG_HOME/mobius/config.toml` (default `~/.config/mobius/config.toml`)
-* Windows
+* Linux & Mac:
+    * `$XDG_CONFIG_HOME/mobius/config.toml` (default: `~/.config/mobius/config.toml`)
+* Windows:
   * `%APPDATA%\mobius\config.toml`
 
 ## Features
