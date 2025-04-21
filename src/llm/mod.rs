@@ -6,18 +6,15 @@ use gemini::Gemini;
 use crate::config::Config;
 use crate::llm::openai::OpenAI;
 use crate::model::Provider;
+use async_trait::async_trait;
 use std::error::Error;
-use std::future::Future;
 
+#[async_trait]
 pub trait LLM {
-    fn chat(
-        &self,
-        system_prompt: &str,
-        user_prompt: &str,
-    ) -> impl Future<Output = Result<String, Box<dyn Error>>> + Send;
+    async fn chat(&self, system_prompt: &str, user_prompt: &str) -> Result<String, Box<dyn Error>>;
 }
 
-pub fn get_llm<'a>(config: &'a Config) -> impl LLM + 'a {
+pub fn get_llm(config: &Config) -> Box<dyn LLM + '_> {
     let provider = &config.llm.provider;
     match provider {
         Provider::OpenAI => Box::new(OpenAI::new(config)),

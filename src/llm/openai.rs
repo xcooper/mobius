@@ -1,5 +1,8 @@
 use std::error::Error;
 
+use crate::config::Config;
+use crate::llm::LLM;
+use crate::CommandExecutionError;
 use async_openai::config::OpenAIConfig;
 use async_openai::types::{
     ChatCompletionRequestMessage, ChatCompletionRequestSystemMessage,
@@ -7,10 +10,7 @@ use async_openai::types::{
     ChatCompletionRequestUserMessageContent, CreateChatCompletionRequestArgs,
 };
 use async_openai::Client;
-
-use crate::config::Config;
-use crate::llm::LLM;
-use crate::CommandExecutionError;
+use async_trait::async_trait;
 
 pub struct OpenAI<'a> {
     config: &'a Config,
@@ -18,14 +18,14 @@ pub struct OpenAI<'a> {
 
 impl<'a> OpenAI<'a> {
     pub fn new(config: &'a Config) -> Self {
-        Self {
-            config,
-        }
+        Self { config }
     }
 
     fn init_client(&self) -> Result<Client<OpenAIConfig>, CommandExecutionError> {
         if self.config.llm.api_key.is_none() {
-            return Err(CommandExecutionError::new("The API key of OpenAI is missing."));
+            return Err(CommandExecutionError::new(
+                "The API key of OpenAI is missing.",
+            ));
         }
         let api_key = self.config.llm.api_key.as_deref().unwrap();
         let oai_cfg = OpenAIConfig::new().with_api_key(api_key);
@@ -34,6 +34,7 @@ impl<'a> OpenAI<'a> {
     }
 }
 
+#[async_trait]
 impl LLM for OpenAI<'_> {
     async fn chat(&self, system_prompt: &str, user_prompt: &str) -> Result<String, Box<dyn Error>> {
         let mut prompts: Vec<ChatCompletionRequestMessage> = Vec::new();

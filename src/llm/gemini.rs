@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
@@ -45,7 +46,8 @@ struct GeminiResp {
     candidates: Vec<Candidate>,
 }
 
-impl<'a> LLM for Gemini<'a> {
+#[async_trait]
+impl LLM for Gemini<'_> {
     async fn chat(
         &self,
         system_prompt: &str,
