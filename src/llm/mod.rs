@@ -21,10 +21,3 @@ pub fn get_llm(config: &Config) -> Box<dyn LLM + '_> {
         Provider::Gemini => Box::new(Gemini::new(config)),
     }
 }
-
-pub fn get_llm_url(provider: &Provider) -> Option<String> {
-    match provider {
-        Provider::OpenAI => Some(String::from("https://api.openai.com/v1")),
-        Provider::Gemini => Some(String::from("https://api.openai.com/v1")),
-    }
-}

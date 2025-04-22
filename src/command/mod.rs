@@ -1,6 +1,6 @@
 use crate::args_parser::{Commands, ParsedArgs};
 use crate::config::{default_config, load_config, save_config};
-use crate::llm::{get_llm, get_llm_url, LLM};
+use crate::llm::{get_llm, LLM};
 use crate::model::Shell;
 use crate::{echo, CommandExecutionError};
 use std::env;
@@ -20,8 +20,6 @@ pub fn do_init(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
         new_config.llm.model = model.clone();
         if let Some(u) = llm_url {
             new_config.llm.url = Some(u.clone());
-        } else {
-            new_config.llm.url = get_llm_url(&new_config.llm.provider);
         }
         if let Some(key) = api_key {
             new_config.llm.api_key = Some(key.clone());
