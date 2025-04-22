@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::model::Provider;
+use serde::{Deserialize, Serialize};
 use std::env;
 use std::fs::write;
 use std::fs::{create_dir_all, read_to_string};

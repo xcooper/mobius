@@ -35,7 +35,7 @@ struct Content {
 #[derive(Serialize)]
 struct GeminiReq {
     contents: Vec<Content>,
-    systemInstruction: Content,
+    system_instruction: Content,
 }
 
 #[derive(Deserialize)]
@@ -59,19 +59,24 @@ impl LLM for Gemini<'_> {
         let model = &self.config.llm.model;
         let def_val = &DEFAULT_API_URL.to_string();
         let api_url = self.config.llm.url.as_ref().unwrap_or(def_val);
-        let req = self.client
+        let req = self
+            .client
             .post(format!("{api_url}/v1beta/models/{model}:generateContent"))
             .header("Content-Type", "application/json")
             .query(&[("key", api_key)])
             .json(&GeminiReq {
                 contents: vec![Content {
-                    parts: vec![Part{ text: user_prompt.to_string() }],
-                    role: "user".to_string()
+                    parts: vec![Part {
+                        text: user_prompt.to_string(),
+                    }],
+                    role: "user".to_string(),
                 }],
-                systemInstruction: Content {
-                    parts: vec![Part{ text: system_prompt.to_string() }],
-                    role: "model".to_string()
-                }
+                system_instruction: Content {
+                    parts: vec![Part {
+                        text: system_prompt.to_string(),
+                    }],
+                    role: "model".to_string(),
+                },
             })
             .build()?;
         let gemini_resp: GeminiResp = self.client.execute(req).await?.json().await?;

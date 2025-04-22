@@ -8,10 +8,18 @@ Download the executable for your OS and place it in a directory included in your
 
 Run `mobius init` to configure the tool and save the settings to the default location.
 
+If you need a free API key, please try [Gemini](https://aistudio.google.com/apikey).
+For example,
+```bash
+mobius init --provider gemini --api-key AIza... --model gemini-2.0-flash
+```
+
+### Shell Auto Complete
+
 To enable *AutoComplete*, add **Mobius** to your shell initialization file. Instructions for different platforms are
 below:
 
-### Windows
+#### Windows
 
 Edit your PowerShell profile `$PROFILE` (e.g.,
 `C:\Users\username\Documents\PowerShell\Microsoft.PowerShell_profile.ps1`) and add:
@@ -20,7 +28,7 @@ Edit your PowerShell profile `$PROFILE` (e.g.,
 Invoke-Expression -Command (mobius auto-complete --shell power-shell | Out-String)
 ```
 
-### Linux
+#### Linux
 
 Edit the shell initialization file for your shell:
 
@@ -102,6 +110,6 @@ The configuration file is located in one of the following paths:
   - [X] Linux ZSH
   - [X] Linux BASH
   - [ ] MAC ZSH
-- [ ] Support more LLM
+- [X] Support more LLM
   - [X] OpenAI
-  - [ ] Gemini
+  - [X] Gemini

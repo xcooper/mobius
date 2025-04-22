@@ -21,7 +21,7 @@ function global:OnTabPressed {
         $afterAi = $lineCursor.Substring($lineCursor.LastIndexOf("ai:") + 3)
         
         # Process with mobius pipe
-        $aiResponse = & mobius chat --prompt "$afterAi" --system-prompt "Be a Windows power shell assistant, only response with command, no wrappers, be concise."
+        $aiResponse = & mobius chat --prompt "$afterAi" --system-prompt "Be a Windows power shell assistant, only response with command, no wrappers, no format, be concise."
         
         # Replace the current line up to cursor with transformed content
         $newLine = $beforeAi + $aiResponse

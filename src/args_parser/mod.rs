@@ -1,9 +1,9 @@
+use crate::model::Provider;
+use crate::model::Shell;
 use clap::command;
 use clap::ArgAction;
 use clap::Parser;
 use clap::Subcommand;
-use crate::model::Provider;
-use crate::model::Shell;
 
 #[derive(Parser, Debug)]
 #[command(about="A CLI for integrating with AI.", long_about=None)]
@@ -20,15 +20,14 @@ pub enum Commands {
     Init {
         #[arg(short, long, help = "The AI provider to use")]
         provider: Provider,
-        #[arg(
-            short,
-            long,
-            help = "The AI model to use, e.g., gpt-4o"
-        )]
+        #[arg(short, long, help = "The AI model to use, e.g., gpt-4o")]
         model: String,
         #[arg(short, long, help = "The API key for accessing the AI provider")]
         api_key: Option<String>,
-        #[arg(long, help = "The URL for accessing the AI provider, only need by in-house LLMs.")]
+        #[arg(
+            long,
+            help = "The URL for accessing the AI provider, only need by in-house LLMs."
+        )]
         llm_url: Option<String>,
     },
     #[command(

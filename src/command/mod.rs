@@ -1,6 +1,6 @@
 use crate::args_parser::{Commands, ParsedArgs};
 use crate::config::{default_config, load_config, save_config};
-use crate::llm::{get_llm, LLM};
+use crate::llm::get_llm;
 use crate::model::Shell;
 use crate::{echo, CommandExecutionError};
 use std::env;
@@ -77,21 +77,21 @@ pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionEr
                         Ok(())
                     } else {
                         Err(CommandExecutionError::new("Must specify shell"))
-                    }
+                    };
                 } else {
                     Err(CommandExecutionError::new("Unsupported Platform"))
                 }
-            },
+            }
             "macos" => {
                 echo!(include_str!("../../scripts/zsh_autocomplete.zsh"));
                 Ok(())
-            },
+            }
             "windows" => {
                 echo!(include_str!("../../scripts/pwsh_autocomplete.ps1"));
                 Ok(())
-            },
-            _ => Err(CommandExecutionError::new("Unsupported Platform"))
-        }
+            }
+            _ => Err(CommandExecutionError::new("Unsupported Platform")),
+        };
     }
     Err(CommandExecutionError::new("invalid command"))
 }
