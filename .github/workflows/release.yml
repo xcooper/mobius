@@ -1,14 +1,14 @@
 # .github/workflows/release.yml
-
 on:
-  workflow_dispatch:
+  release:
+    types: [published]
 
 jobs:
   release:
     name: release ${{ matrix.target }}
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - target: x86_64-pc-windows-gnu
