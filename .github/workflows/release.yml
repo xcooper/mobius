@@ -13,12 +13,14 @@ jobs:
         include:
           - target: x86_64-pc-windows-gnu
             os: windows-latest
-            executable: mobius.exe
-            format: zip
+            compress_cmds: |
+              Compress-Archive -Path .\target\release\mobius.exe -DestinationPath .\target\release\mobius-release-x86_64-pc-windows-gnu.zip
+            archive: .\target\release\mobius-release-x86_64-pc-windows-gnu.zip
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
-            executable: mobius
-            format: tgz
+            compress_cmds: |
+              tar zcf ./target/release/mobius-release-x86_64-unknown-linux-gnu.tar.gz ./target/release/mobius
+            archive: ./target/release/mobius-release-x86_64-unknown-linux-gnu.tar.gz
     steps:
       - name: set rust version
         run: rustup override set stable
@@ -28,14 +30,9 @@ jobs:
       - name: run tests
         run: cargo test
       - name: compress artifact
-        uses: somaz94/compress-decompress@v1.5.1
-        with:
-          command: compress
-          format: ${{ matrix.format }}
-          source: ./target/release/${{ matrix.executable }}
-          destfilename: mobius-release-${{ matrix.target }}.${{ matrix.format }}
+        run: ${{ matrix.compress_cmds }}
       - name: upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: mobius-release-${{ matrix.target }}
-          path: ./target/release/mobius-release-${{ matrix.target }}.${{ matrix.format }}
+          path: ${{ matrix.archive }}
