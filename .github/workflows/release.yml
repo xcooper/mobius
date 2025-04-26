@@ -2,27 +2,43 @@
 on:
   release:
     types: [published]
+  workflow_dispatch: 
 
 jobs:
-  release:
-    name: release ${{ matrix.target }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      matrix:
-        include:
-          - target: x86_64-pc-windows-gnu
-            archive: zip
-          - target: x86_64-unknown-linux-musl
-            archive: tar.gz tar.xz tar.zst
+  release-windows:
+    name: release artifact for windows
+    runs-on: windows-latest
+    concurrency: 
+      group: windows
     steps:
-      - uses: actions/checkout@master
-      - name: Compile and release
-        uses: rust-build/rust-build.action@v1.4.5
-        env:
-          GITHUB_TOKEN: ${{ secrets.MOBIUS_RELEASE }}
-          TOOLCHAIN_VERSION: 1.86.0
-          STATIC_LINK: true
+      - uses: actions/checkout@v4
+      - name: build
+        run: cargo build --profile release
+      - name: run tests
+        run: cargo test
+      - name: compress artifact
+        shell: pwsh
+        run: Compress-Archive -Path .\target\release\mobius.exe -DestinationPath .\target\release\mobius-release-windows-x86_64.zip
+      - name: release artifact
+        uses: actions/upload-artifact@v4
         with:
-          RUSTTARGET: ${{ matrix.target }}
-          ARCHIVE_TYPES: ${{ matrix.archive }}
+          name: mobius-release-windows-x86_64
+          path: .\target\release\mobius-release-windows-x86_64.zip
+  release-linux-gnu:
+    name: release artifact for linux
+    runs-on: ubuntu-latest
+    concurrency: 
+      group: linux
+    steps:
+      - uses: actions/checkout@v4
+      - name: build
+        run: cargo build --profile release
+      - name: run tests
+        run: cargo test
+      - name: compress artifact
+        run: tar zcf ./target/release/mobius-release-linux-gnu.tgz ./target/release/mobius
+      - name: release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobius-release-linux-x86_64
+          path: ./target/release/mobius-release-linux-gnu.tgz
