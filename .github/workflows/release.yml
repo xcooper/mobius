@@ -5,17 +5,19 @@ on:
   workflow_dispatch: 
 
 jobs:
-  release-windows:
+  release:
     name: release artifact for ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
-          - target: windows-x86_64
+          - target: x86_64-pc-windows-gnu
             os: windows-latest
+            executable: mobius.exe
             format: zip
-          - target: linux-x86_64
+          - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
+            executable: mobius
             format: tgz
     steps:
       - name: set rust version
@@ -30,7 +32,8 @@ jobs:
         with:
           command: compress
           format: ${{ matrix.format }}
-          source: ./target/release/mobius-release-${{ matrix.target }}
+          source: ./target/release/${{ matrix.executable }}
+          destfilename: mobius-release-${{ matrix.target }}.${{ matrix.format }}
       - name: upload artifact
         uses: actions/upload-artifact@v4
         with:
