@@ -11,6 +11,8 @@ jobs:
     concurrency: 
       group: windows
     steps:
+      - name: set rust version
+        run: rustup override set stable
       - uses: actions/checkout@v4
       - name: build
         run: cargo build --profile release
@@ -30,6 +32,8 @@ jobs:
     concurrency: 
       group: linux
     steps:
+      - name: set rust version
+        run: rustup override set stable
       - uses: actions/checkout@v4
       - name: build
         run: cargo build --profile release

@@ -97,7 +97,7 @@ mod tests {
         let path = get_config_path().unwrap();
         match os {
             "linux" | "macos" => {
-                assert_eq!(path.to_str().unwrap(), "~/.config/mobius/config.toml");
+                assert_eq!(path.to_str().unwrap(), format!("{}/.config/mobius/config.toml", env::var("HOME").unwrap()));
             }
             "windows" => {
                 assert_eq!(
