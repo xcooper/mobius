@@ -70,10 +70,10 @@ pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionEr
             "linux" => {
                 if let Some(s) = shell {
                     return if s == &Shell::Bash {
-                        echo!(include_str!("../../scripts/bash_autocomplete.bash"));
+                        echo!(ensure_eol(include_str!("../../scripts/bash_autocomplete.bash"), "linux"));
                         Ok(())
                     } else if s == &Shell::Zsh {
-                        echo!(include_str!("../../scripts/zsh_autocomplete.zsh"));
+                        echo!(ensure_eol(include_str!("../../scripts/zsh_autocomplete.zsh"), "linux"));
                         Ok(())
                     } else {
                         Err(CommandExecutionError::new("Must specify shell"))
@@ -83,17 +83,32 @@ pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionEr
                 }
             }
             "macos" => {
-                echo!(include_str!("../../scripts/zsh_autocomplete.zsh"));
+                echo!(ensure_eol(include_str!("../../scripts/zsh_autocomplete.zsh"), "macos"));
                 Ok(())
             }
             "windows" => {
-                echo!(include_str!("../../scripts/pwsh_autocomplete.ps1"));
+                echo!(ensure_eol(include_str!("../../scripts/pwsh_autocomplete.ps1"), "windows"));
                 Ok(())
             }
             _ => Err(CommandExecutionError::new("Unsupported Platform")),
         };
     }
     Err(CommandExecutionError::new("invalid command"))
+}
+
+fn ensure_eol(input: &str, platform: &str) -> String {
+    let ret = match platform {
+        "windows" => {
+            if !input.contains("\r\n") {
+                input.replace("\n", "\r\n")
+            } else {
+                input.to_string()
+            }
+        },
+        "macos" | "linux" => input.replace("\r\n", "\n"),
+        _ => panic!("Unsupported platform"),
+    };
+    return ret;
 }
 
 fn default_sys_prompt() -> String {
