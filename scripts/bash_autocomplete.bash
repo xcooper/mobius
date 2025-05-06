@@ -17,11 +17,8 @@ _mobius_completer() {
         READLINE_LINE="${before_ai}${ai_resp}${READLINE_LINE:$READLINE_POINT}"
         # Place cursor after the inserted text
         READLINE_POINT=$((${#before_ai} + ${#ai_resp}))
-    else
-        # Default to normal tab completion
-        bind '"\C-i": complete'
     fi
 }
 
 # Bind Tab key to our custom function
-bind -x '"\C-i": _mobius_completer'
+bind -x '"\C-/": _mobius_completer'

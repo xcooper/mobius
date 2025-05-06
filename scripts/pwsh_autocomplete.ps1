@@ -4,7 +4,7 @@ if (-not (Get-Command mobius -ErrorAction SilentlyContinue)) {
 }
 
 # Register the tab key handler
-function global:OnTabPressed {
+function global:TriggerMobius {
     param($key, $arg)
 
     # Get the line content and cursor position
@@ -29,11 +29,7 @@ function global:OnTabPressed {
         # Update the current line
         [Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $cursor, $newLine)
     }
-    else {
-        # Default tab completion behavior
-        [Microsoft.PowerShell.PSConsoleReadLine]::TabCompleteNext($key, $arg)
-    }
 }
 
 # Set the PSReadLine key handler
-Set-PSReadLineKeyHandler -Key Tab -ScriptBlock $function:OnTabPressed
+Set-PSReadLineKeyHandler -Key 'Ctrl+/' -ScriptBlock $function:TriggerMobius
