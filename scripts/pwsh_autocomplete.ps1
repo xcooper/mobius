@@ -32,4 +32,4 @@ function global:TriggerMobius {
 }
 
 # Set the PSReadLine key handler
-Set-PSReadLineKeyHandler -Key 'Ctrl+/' -ScriptBlock $function:TriggerMobius
+Set-PSReadLineKeyHandler -Chord 'Ctrl+/' -ScriptBlock $function:TriggerMobius
