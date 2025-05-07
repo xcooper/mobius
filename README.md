@@ -72,7 +72,7 @@ Options:
 
 ### Shell Auto Complete
 
-Enable AI-powered auto-completion triggered by the `TAB` key with the prefix `ai:`. The AI-generated commands will
+Enable AI-powered auto-completion triggered by the `CTRL+/` key with the prefix `ai:`. The AI-generated commands will
 consider your operating system.
 
 Refer to the "Get Started" section for setup instructions.
@@ -105,11 +105,11 @@ The configuration file is located in one of the following paths:
 - [X] Ask AI generating a command based your prompt
 - [ ] Call other commands based on AI response
 - [ ] Manage prompts
-- [ ] Trigger AI generating a command using auto-complete(Tab key)
+- [X] Trigger AI generating a command using auto-complete(CTRL+/ key)
   - [X] Windows PowerShell
   - [X] Linux ZSH
   - [X] Linux BASH
-  - [ ] MAC ZSH
+  - [X] MAC ZSH
 - [X] Support more LLM
   - [X] OpenAI
   - [X] Gemini
