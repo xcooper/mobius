@@ -21,4 +21,4 @@ _mobius_completer() {
 }
 
 # Bind Tab key to our custom function
-bind -x '"\C-/": _mobius_completer'
+bind -x '"\C-_": _mobius_completer'
