@@ -22,9 +22,11 @@ function global:TriggerMobius {
         
         # Process with mobius pipe
         $aiResponse = & mobius chat --prompt "$afterAi" --system-prompt "Be a Windows power shell assistant, only response with command, no wrappers, no format, be concise."
+        $trimmedAiResponse = $aiResponse.Trim("```powershell\n")
+        $trimmedAiResponse = $trimmedAiResponse.Trim("`")
         
         # Replace the current line up to cursor with transformed content
-        $newLine = $beforeAi + $aiResponse
+        $newLine = $beforeAi + $trimmedAiResponse
         
         # Update the current line
         [Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $cursor, $newLine)
