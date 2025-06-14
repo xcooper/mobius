@@ -11,10 +11,12 @@ _mobius_completer() {
     local after_ai="${line_before_cursor#*ai:}"
 
     # Run the mobius command with the text after "ai:"
-    local ai_resp=$(mobius chat --prompt "$after_ai" --system-prompt "Be a Linux shell command assistant, only response with command, no wrappers, no format, be concise.")
-    unwrapped_ai_resp=$ai_resp
-    unwrapped_ai_resp=$(echo ${ai_resp} | sed -E 's/^\`*(bash\n)//; s/\n\`*$//')
-    unwrapped_ai_resp=$(echo ${ai_resp} | sed -E 's/^\`*//; s/\`*$//')
+    local ai_resp=$(mobius chat \
+        --prompt "$after_ai" \
+        --system-prompt "Be a Linux shell command assistant, \
+            only response with command, \
+            no wrap, no format, be concise.")
+    unwrapped_ai_resp=$(echo ${ai_resp} | sed -E '/^\`+[a-z]*$/d; /^\`+$/d')
 
     # Reconstruct the command line
     READLINE_LINE="${before_ai}${unwrapped_ai_resp}${READLINE_LINE:$READLINE_POINT}"
@@ -23,5 +25,5 @@ _mobius_completer() {
   fi
 }
 
-# Bind Tab key to our custom function
+# Bind Ctrl+/ key to our custom function
 bind -x '"\C-_": _mobius_completer'
