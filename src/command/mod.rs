@@ -75,6 +75,9 @@ pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionEr
                     } else if s == &Shell::Zsh {
                         echo!(ensure_eol(include_str!("../../scripts/zsh_autocomplete.zsh"), "linux"));
                         Ok(())
+                    } else if s == &Shell::PowerShell {
+                        echo!(ensure_eol(include_str!("../../scripts/pwsh_autocomplete.ps1"), "linux"));
+                        Ok(())
                     } else {
                         Err(CommandExecutionError::new("Must specify shell"))
                     };
