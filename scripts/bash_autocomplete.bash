@@ -16,7 +16,7 @@ _mobius_completer() {
         --system-prompt "Be a Linux shell command assistant, \
             only response with command, \
             no wrap, no format, be concise.")
-    unwrapped_ai_resp=$(echo ${ai_resp} | sed -E '/^\`+[a-z]*$/d; /^\`+$/d')
+    unwrapped_ai_resp=$(echo ${ai_resp} | sed -E '/^`+[a-z]*$/d; /^`+$/d')
 
     # Reconstruct the command line
     READLINE_LINE="${before_ai}${unwrapped_ai_resp}${READLINE_LINE:$READLINE_POINT}"
