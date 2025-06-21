@@ -23,7 +23,7 @@ impl<'a> OpenAI<'a> {
 
     fn init_client(&self) -> Result<Client<OpenAIConfig>, CommandExecutionError> {
         if self.config.llm.api_key.is_none() {
-            return Err(CommandExecutionError::from(
+            return Err(CommandExecutionError::new(
                 "The API key of OpenAI is missing.",
             ));
         }
@@ -62,12 +62,12 @@ impl LLM for OpenAI<'_> {
         if let Some(choice) = resp.choices.first() {
             return match &choice.message.content {
                 Some(content) => Ok(content.clone()),
-                None => Err(Box::new(CommandExecutionError::from(
+                None => Err(Box::new(CommandExecutionError::new(
                     "no content in response",
                 ))),
             };
         }
-        Err(Box::new(CommandExecutionError::from(
+        Err(Box::new(CommandExecutionError::new(
             "error in OpenAI response.",
         )))
     }
