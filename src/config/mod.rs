@@ -66,9 +66,13 @@ pub fn get_config_path() -> Result<PathBuf, Error> {
             let xdg_cfg_home = env::var("XDG_CONFIG_HOME");
             if let Ok(cfg_path) = xdg_cfg_home {
                 Ok(PathBuf::from(cfg_path).join("mobius/config.toml"))
-            } else {
-                let home = env::var("HOME").unwrap();
+            } else if let Ok(home) = env::var("HOME") {
                 Ok(PathBuf::from(home).join(".config/mobius/config.toml"))
+            } else {
+                Err(Error::new(
+                    ErrorKind::NotFound, 
+                    "Cannot determine the config path from environment variables.  Check HOME or XDG_CONFIG_HOME."
+                ))
             }
         }
         "windows" => {
