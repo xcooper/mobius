@@ -45,7 +45,7 @@ pub enum Commands {
         about = "Generate CLI auto-complete script based on the OS and the shell"
     )]
     AutoComplete {
-        #[arg(short, long)]
+        #[arg(long)]
         shell: Option<Shell>,
     },
 }
