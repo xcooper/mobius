@@ -1,4 +1,4 @@
 build-docker:
 	mkdir -p ./target/
 	cp ~/.config/mobius/config.toml ./target/
-	container build --tag mobius-test
+	podman build --tag mobius-test --file ./Dockerfile

@@ -63,15 +63,14 @@ pub fn get_config_path() -> Result<PathBuf, Error> {
     let os = env::consts::OS;
     match os {
         "linux" | "macos" => {
-            let xdg_cfg_home = env::var("XDG_CONFIG_HOME");
-            if let Ok(cfg_path) = xdg_cfg_home {
+            if let Ok(cfg_path) = env::var("XDG_CONFIG_HOME") {
                 Ok(PathBuf::from(cfg_path).join("mobius/config.toml"))
             } else if let Ok(home) = env::var("HOME") {
                 Ok(PathBuf::from(home).join(".config/mobius/config.toml"))
             } else {
                 Err(Error::new(
                     ErrorKind::NotFound, 
-                    "Cannot determine the config path from environment variables.  Check HOME or XDG_CONFIG_HOME."
+                    "cannot determine the config path, check HOME or XDG_CONFIG_HOME."
                 ))
             }
         }

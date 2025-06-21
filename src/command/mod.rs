@@ -33,7 +33,10 @@ pub fn do_init(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
 
 pub async fn do_chat(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
     let cmd = &args.command;
-    let config = load_config().map_err(|_| CommandExecutionError::new("can not load config"))?;
+    let config = load_config()
+        .map_err(|e| CommandExecutionError::new(
+            format!("can not load config: {}", e).as_str()
+        ))?;
     if let Commands::Chat {
         prompt,
         system_prompt,
