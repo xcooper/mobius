@@ -25,7 +25,7 @@ pub fn do_init(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
             new_config.llm.api_key = Some(key.clone());
         }
         if let Err(_) = save_config(&new_config) {
-            return Err(CommandExecutionError::new("Failed to save config"));
+            return Err(CommandExecutionError::from("Failed to save config"));
         }
     }
     Ok(())
@@ -34,8 +34,8 @@ pub fn do_init(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
 pub async fn do_chat(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
     let cmd = &args.command;
     let config = load_config()
-        .map_err(|e| CommandExecutionError::new(
-            format!("can not load config: {}", e).as_str()
+        .map_err(|e| CommandExecutionError::from(
+            format!("can not load config: {}", e)
         ))?;
     if let Commands::Chat {
         prompt,
@@ -47,7 +47,7 @@ pub async fn do_chat(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
             let mut stdin = stdin().lock();
             stdin
                 .read_to_string(&mut user_prompt)
-                .map_err(|_| CommandExecutionError::new("can not read stdin"))?;
+                .map_err(|_| CommandExecutionError::from("can not read stdin"))?;
         }
         let llm = get_llm(&config);
         return match llm
@@ -61,10 +61,10 @@ pub async fn do_chat(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
                 echo!(o);
                 Ok(())
             }
-            Err(e) => Err(CommandExecutionError::from_string(format!("{:?}", e))),
+            Err(e) => Err(CommandExecutionError::from(format!("{:?}", e))),
         };
     }
-    Err(CommandExecutionError::new("invalid command"))
+    Err(CommandExecutionError::from("invalid command"))
 }
 
 pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
@@ -82,10 +82,10 @@ pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionEr
                         echo!(ensure_eol(include_str!("../../scripts/pwsh_autocomplete.ps1"), "linux"));
                         Ok(())
                     } else {
-                        Err(CommandExecutionError::new("Must specify shell"))
+                        Err(CommandExecutionError::from("Must specify shell"))
                     };
                 } else {
-                    Err(CommandExecutionError::new("Unsupported Platform"))
+                    Err(CommandExecutionError::from("Unsupported Platform"))
                 }
             }
             "macos" => {
@@ -96,10 +96,10 @@ pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionEr
                 echo!(ensure_eol(include_str!("../../scripts/pwsh_autocomplete.ps1"), "windows"));
                 Ok(())
             }
-            _ => Err(CommandExecutionError::new("Unsupported Platform")),
+            _ => Err(CommandExecutionError::from("Unsupported Platform")),
         };
     }
-    Err(CommandExecutionError::new("invalid command"))
+    Err(CommandExecutionError::from("invalid command"))
 }
 
 fn ensure_eol(input: &str, platform: &str) -> String {

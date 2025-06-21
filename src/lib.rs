@@ -18,16 +18,18 @@ pub struct CommandExecutionError {
     error_message: String,
 }
 
-impl CommandExecutionError {
-    fn new(msg: &str) -> CommandExecutionError {
+impl From<String> for CommandExecutionError {
+    fn from(msg: String) -> Self {
         CommandExecutionError {
-            error_message: String::from(msg),
+            error_message: msg,
         }
     }
+}
 
-    fn from_string(msg: String) -> CommandExecutionError {
+impl From<&str> for CommandExecutionError {
+    fn from(msg: &str) -> Self {
         CommandExecutionError {
-            error_message: String::from(msg),
+            error_message: msg.to_string(),
         }
     }
 }
