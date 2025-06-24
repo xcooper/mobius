@@ -4,7 +4,7 @@ FROM rust:1.86.0 as builder
 ENV HOME=/root
 RUN \
 	mkdir /root/pwsh; \
-	curl -L https://github.com/PowerShell/PowerShell/releases/download/v7.4.10/powershell-7.4.10-linux-arm64.tar.gz | tar zx -C /root/pwsh/; \
+	curl -L https://github.com/PowerShell/PowerShell/releases/download/v7.4.10/powershell-7.4.10-linux-x64.tar.gz | tar zx -C /root/pwsh/; \
 	chmod +x /root/pwsh/pwsh; \
 	ln -s /root/pwsh/pwsh /usr/bin/pwsh; \
 	apt-get update; \
