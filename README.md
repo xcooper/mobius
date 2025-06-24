@@ -87,6 +87,7 @@ Options:
 Example: Typing `ai:find foobar in all files` will return `grep -R foobar` on Linux.
 
 > Note: The AI-generated commands are based on public knowledge. Verify them before pressing ENTER.
+> Powershell on Linux is not supported.
 
 ## Config File
 
