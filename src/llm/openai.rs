@@ -3,72 +3,91 @@ use std::error::Error;
 use crate::config::Config;
 use crate::llm::LLM;
 use crate::CommandExecutionError;
-use async_openai::config::OpenAIConfig;
-use async_openai::types::{
-    ChatCompletionRequestMessage, ChatCompletionRequestSystemMessage,
-    ChatCompletionRequestSystemMessageContent, ChatCompletionRequestUserMessage,
-    ChatCompletionRequestUserMessageContent, CreateChatCompletionRequestArgs,
-};
-use async_openai::Client;
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
+use chrono::serde::ts_milliseconds;
+use reqwest::Client;
+use serde::{Deserialize, Serialize};
+
+const DEFAULT_URL: &str = "https://api.openai.com/v1";
 
 pub struct OpenAI<'a> {
     config: &'a Config,
+    client: Client,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct OpenAIRequest {
+    model: String,
+    input: String,
+    instructions: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct OpenAIResponse {
+    id: Option<String>,
+    #[serde(with = "ts_milliseconds")]
+    created_at: DateTime<Utc>,
+    status: Option<String>,
+    error: Option<OpenAIErrorResponse>,
+    output: Option<Vec<OpenAIOutput>>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct OpenAIOutput {
+    id: String,
+    status: String,
+    role: String,
+    content: Vec<OpenAIResponseContent>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct OpenAIResponseContent {
+    text: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct OpenAIErrorResponse {
+    code: String,
+    message: String,
 }
 
 impl<'a> OpenAI<'a> {
     pub fn new(config: &'a Config) -> Self {
-        Self { config }
-    }
-
-    fn init_client(&self) -> Result<Client<OpenAIConfig>, CommandExecutionError> {
-        if self.config.llm.api_key.is_none() {
-            return Err(CommandExecutionError::new(
-                "The API key of OpenAI is missing.",
-            ));
+        OpenAI {
+            config,
+            client: reqwest::Client::new(),
         }
-        let api_key = self.config.llm.api_key.as_deref().unwrap();
-        let oai_cfg = OpenAIConfig::new().with_api_key(api_key);
-        let client = Client::with_config(oai_cfg);
-        Ok(client)
     }
 }
 
 #[async_trait]
 impl LLM for OpenAI<'_> {
     async fn chat(&self, system_prompt: &str, user_prompt: &str) -> Result<String, Box<dyn Error>> {
-        let mut prompts: Vec<ChatCompletionRequestMessage> = Vec::new();
-        prompts.push(ChatCompletionRequestMessage::System(
-            ChatCompletionRequestSystemMessage {
-                content: ChatCompletionRequestSystemMessageContent::Text(system_prompt.to_string()),
-                name: None,
-            },
-        ));
-        prompts.push(ChatCompletionRequestMessage::User(
-            ChatCompletionRequestUserMessage {
-                content: ChatCompletionRequestUserMessageContent::Text(user_prompt.to_string()),
-                name: None,
-            },
-        ));
-
-        let req = CreateChatCompletionRequestArgs::default()
-            .model(self.config.llm.model.clone())
-            .temperature(self.config.llm.default_temperature as f32)
-            .messages(prompts)
-            .build()
-            .unwrap();
-        let client = self.init_client()?;
-        let resp = client.chat().create(req).await?;
-        if let Some(choice) = resp.choices.first() {
-            return match &choice.message.content {
-                Some(content) => Ok(content.clone()),
-                None => Err(Box::new(CommandExecutionError::new(
-                    "no content in response",
-                ))),
-            };
+        let llm = &self.config.llm;
+        let default_url = &DEFAULT_URL.to_string();
+        let url = llm.url.as_ref().unwrap_or(default_url);
+        let api_key = llm.api_key.as_ref().unwrap();
+        let model = llm.model.clone();
+        let req = self.client
+            .post(format!("{url}/responses"))
+            .bearer_auth(api_key)
+            .header("Content-Type", "application/json")
+            .json(&OpenAIRequest {
+                model: model,
+                instructions: system_prompt.to_string(),
+                input: user_prompt.to_string(),
+            })
+            .build()?;
+        let resp: OpenAIResponse = self.client
+            .execute(req).await?
+            .json().await?;
+        if let Some(e) = resp.error {
+            Err(Box::new(CommandExecutionError{
+                error_message: format!("OpenAI returned error: {}", e.message),
+            }))
+        } else {
+            Ok(resp.output.unwrap()[0].content[0].text.clone())
         }
-        Err(Box::new(CommandExecutionError::new(
-            "error in OpenAI response.",
-        )))
     }
 }
