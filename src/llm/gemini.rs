@@ -3,7 +3,7 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
 use super::LLM;
-use crate::config::Config;
+use crate::{config::Config, CommandExecutionError};
 
 const DEFAULT_API_URL: &str = "https://generativelanguage.googleapis.com/";
 
@@ -79,7 +79,9 @@ impl LLM for Gemini<'_> {
                 },
             })
             .build()?;
-        let gemini_resp: GeminiResp = self.client.execute(req).await?.json().await?;
+        let gemini_resp: GeminiResp = self.client
+            .execute(req).await?
+            .json().await?;
         return Ok(gemini_resp.candidates[0].content.parts[0].text.clone());
     }
 }
