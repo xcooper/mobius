@@ -3,7 +3,7 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
 use super::LLM;
-use crate::{config::Config, CommandExecutionError};
+use crate::config::Config;
 
 const DEFAULT_API_URL: &str = "https://generativelanguage.googleapis.com/";
 
