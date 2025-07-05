@@ -2,7 +2,6 @@ use std::error::Error;
 
 use crate::config::Config;
 use crate::llm::LLM;
-use crate::CommandExecutionError;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use chrono::serde::ts_milliseconds;
@@ -82,12 +81,6 @@ impl LLM for OpenAI<'_> {
         let resp: OpenAIResponse = self.client
             .execute(req).await?
             .json().await?;
-        if let Some(e) = resp.error {
-            Err(Box::new(CommandExecutionError{
-                error_message: format!("OpenAI returned error: {}", e.message),
-            }))
-        } else {
-            Ok(resp.output.unwrap()[0].content[0].text.clone())
-        }
+        Ok(resp.output.unwrap()[0].content[0].text.clone())
     }
 }
