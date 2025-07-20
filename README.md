@@ -16,6 +16,14 @@ mobius init --provider gemini --api-key AIza... --model gemini-2.0-flash
 
 ### Shell Auto Complete
 
+Enable AI-powered auto-completion triggered by the `CTRL+/` key with the prefix `ai:`. The AI-generated commands will
+consider your operating system.
+
+Example: Typing `ai:find foobar in all files` will return `grep -R foobar` on Linux.
+
+> Note: The AI-generated commands are based on public knowledge. Verify them before pressing ENTER.
+> Powershell on Linux is not supported.
+
 To enable *AutoComplete*, add **Mobius** to your shell initialization file. Instructions for different platforms are
 below:
 
@@ -44,50 +52,19 @@ source <(mobius auto-complete --shell zsh)
 
 ## Commands
 
-### Init
-
-Set up initial configurations.
-
-```
-Usage: mobius.exe init [OPTIONS] --provider <PROVIDER> --model <MODEL>
-
-Options:
-  -p, --provider <PROVIDER>  The AI provider to use [possible values: open-ai]
-  -m, --model <MODEL>        The AI model to use, e.g., gpt-4o
-  -a, --api-key <API_KEY>    The API key for accessing the AI provider
-      --llm-url <LLM_URL>    The URL for accessing the AI provider, only need by in-house LLMs.
-```
-
 ### Chat
 
-Interact with the LLM using prompts and display the response in the terminal.
+The `chat` command allows you to have a conversation with the AI. You can provide your message directly as an argument or pipe it from another command. This is useful for asking questions, generating text, or getting help with various tasks.
 
-```
-Usage: mobius.exe chat [OPTIONS] --prompt <PROMPT>
-
-Options:
-  -p, --prompt <PROMPT>                The prompt, use '-' for reading from stdin
-  -s, --system-prompt <SYSTEM_PROMPT>  The system prompt
+For example, you can ask a simple question like this:
+```bash
+mobius chat --prompt "What is the capital of France?"
 ```
 
-### Shell Auto Complete
-
-Enable AI-powered auto-completion triggered by the `CTRL+/` key with the prefix `ai:`. The AI-generated commands will
-consider your operating system.
-
-Refer to the "Get Started" section for setup instructions.
-
+You can also use it with other commands. For example, to ask the AI to explain a command's output:
+```bash
+ls -l | mobius chat --prompt "Explain what these file permissions mean"
 ```
-Usage: mobius.exe auto-complete [OPTIONS]
-
-Options:
-  -s, --shell <SHELL>  [possible values: zsh, bash, power-shell]
-```
-
-Example: Typing `ai:find foobar in all files` will return `grep -R foobar` on Linux.
-
-> Note: The AI-generated commands are based on public knowledge. Verify them before pressing ENTER.
-> Powershell on Linux is not supported.
 
 ## Config File
 
@@ -100,10 +77,11 @@ The configuration file is located in one of the following paths:
 * Windows:
   * `%APPDATA%\mobius\config.toml`
 
-## Features
+## TODOs
 
 - [X] Let AI processing the input and produce meaningful output
 - [X] Ask AI generating a command based your prompt
+- [ ] Have a tool checking the existence of commands on user's local.
 - [ ] Call other commands based on AI response
 - [ ] Manage prompts
 - [X] Trigger AI generating a command using auto-complete(CTRL+/ key)
