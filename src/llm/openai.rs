@@ -92,12 +92,12 @@ fn concat_msgs(sys_prompt: &str, user_prompts: Vec<&str>) -> Vec<Message> {
     let mut msgs: Vec<Message> = Vec::new();
     msgs.push(Message {
         role: super::Role::System,
-        content: sys_prompt.clone().to_string(),
+        content: sys_prompt.to_string(),
     });
     for user_prompt in user_prompts {
         msgs.push(Message {
             role: super::Role::User,
-            content: user_prompt.clone().to_string(),
+            content: user_prompt.to_string(),
         });
     }
     return msgs;
