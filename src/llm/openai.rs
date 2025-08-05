@@ -1,10 +1,11 @@
 use std::error::Error;
 
+use super::Message;
 use crate::config::Config;
 use crate::llm::LLM;
 use async_trait::async_trait;
-use chrono::{DateTime, Utc};
 use chrono::serde::ts_milliseconds;
+use chrono::{DateTime, Utc};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
@@ -17,9 +18,8 @@ pub struct OpenAI<'a> {
 
 #[derive(Debug, Serialize, Deserialize)]
 struct OpenAIRequest {
-    model: String,
-    input: String,
-    instructions: String,
+    model: Option<String>,
+    input: Vec<Message>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -62,25 +62,43 @@ impl<'a> OpenAI<'a> {
 
 #[async_trait]
 impl LLM for OpenAI<'_> {
-    async fn chat(&self, system_prompt: &str, user_prompt: &str) -> Result<String, Box<dyn Error>> {
+    async fn chat(
+        &self,
+        system_prompt: &str,
+        user_prompts: Vec<&str>,
+    ) -> Result<String, Box<dyn Error>> {
         let llm = &self.config.llm;
         let default_url = &DEFAULT_URL.to_string();
         let url = llm.url.as_ref().unwrap_or(default_url);
         let api_key = llm.api_key.as_ref().unwrap();
         let model = llm.model.clone();
-        let req = self.client
+        let input = concat_msgs(system_prompt, user_prompts);
+        let req = self
+            .client
             .post(format!("{url}/responses"))
             .bearer_auth(api_key)
             .header("Content-Type", "application/json")
             .json(&OpenAIRequest {
-                model: model,
-                instructions: system_prompt.to_string(),
-                input: user_prompt.to_string(),
+                model: Some(model),
+                input: input,
             })
             .build()?;
-        let resp: OpenAIResponse = self.client
-            .execute(req).await?
-            .json().await?;
+        let resp: OpenAIResponse = self.client.execute(req).await?.json().await?;
         Ok(resp.output.unwrap()[0].content[0].text.clone())
     }
+}
+
+fn concat_msgs(sys_prompt: &str, user_prompts: Vec<&str>) -> Vec<Message> {
+    let mut msgs: Vec<Message> = Vec::new();
+    msgs.push(Message {
+        role: super::Role::System,
+        content: sys_prompt.clone().to_string(),
+    });
+    for user_prompt in user_prompts {
+        msgs.push(Message {
+            role: super::Role::User,
+            content: user_prompt.clone().to_string(),
+        });
+    }
+    return msgs;
 }

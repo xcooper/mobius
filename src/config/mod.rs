@@ -69,8 +69,8 @@ pub fn get_config_path() -> Result<PathBuf, Error> {
                 Ok(PathBuf::from(home).join(".config/mobius/config.toml"))
             } else {
                 Err(Error::new(
-                    ErrorKind::NotFound, 
-                    "cannot determine the config path, check HOME or XDG_CONFIG_HOME."
+                    ErrorKind::NotFound,
+                    "cannot determine the config path, check HOME or XDG_CONFIG_HOME.",
                 ))
             }
         }
@@ -100,7 +100,10 @@ mod tests {
         let path = get_config_path().unwrap();
         match os {
             "linux" | "macos" => {
-                assert_eq!(path.to_str().unwrap(), format!("{}/.config/mobius/config.toml", env::var("HOME").unwrap()));
+                assert_eq!(
+                    path.to_str().unwrap(),
+                    format!("{}/.config/mobius/config.toml", env::var("HOME").unwrap())
+                );
             }
             "windows" => {
                 assert_eq!(

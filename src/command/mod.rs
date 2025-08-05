@@ -34,9 +34,7 @@ pub fn do_init(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
 pub async fn do_chat(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
     let cmd = &args.command;
     let config = load_config()
-        .map_err(|e| CommandExecutionError::new(
-            format!("can not load config: {}", e)
-        ))?;
+        .map_err(|e| CommandExecutionError::new(format!("can not load config: {}", e)))?;
     if let Commands::Chat {
         prompt,
         system_prompt,
@@ -53,7 +51,7 @@ pub async fn do_chat(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
         return match llm
             .chat(
                 system_prompt.as_ref().map_or(&default_sys_prompt(), |v| v),
-                &user_prompt,
+                vec![&user_prompt],
             )
             .await
         {
@@ -73,13 +71,22 @@ pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionEr
             "linux" => {
                 if let Some(s) = shell {
                     return if s == &Shell::Bash {
-                        echo!(ensure_eol(include_str!("../../scripts/bash_autocomplete.bash"), "linux"));
+                        echo!(ensure_eol(
+                            include_str!("../../scripts/bash_autocomplete.bash"),
+                            "linux"
+                        ));
                         Ok(())
                     } else if s == &Shell::Zsh {
-                        echo!(ensure_eol(include_str!("../../scripts/zsh_autocomplete.zsh"), "linux"));
+                        echo!(ensure_eol(
+                            include_str!("../../scripts/zsh_autocomplete.zsh"),
+                            "linux"
+                        ));
                         Ok(())
                     } else if s == &Shell::PowerShell {
-                        echo!(ensure_eol(include_str!("../../scripts/pwsh_autocomplete.ps1"), "linux"));
+                        echo!(ensure_eol(
+                            include_str!("../../scripts/pwsh_autocomplete.ps1"),
+                            "linux"
+                        ));
                         Ok(())
                     } else {
                         Err(CommandExecutionError::new("Must specify shell"))
@@ -89,11 +96,17 @@ pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionEr
                 }
             }
             "macos" => {
-                echo!(ensure_eol(include_str!("../../scripts/zsh_autocomplete.zsh"), "macos"));
+                echo!(ensure_eol(
+                    include_str!("../../scripts/zsh_autocomplete.zsh"),
+                    "macos"
+                ));
                 Ok(())
             }
             "windows" => {
-                echo!(ensure_eol(include_str!("../../scripts/pwsh_autocomplete.ps1"), "windows"));
+                echo!(ensure_eol(
+                    include_str!("../../scripts/pwsh_autocomplete.ps1"),
+                    "windows"
+                ));
                 Ok(())
             }
             _ => Err(CommandExecutionError::new("Unsupported Platform")),
@@ -110,7 +123,7 @@ fn ensure_eol(input: &str, platform: &str) -> String {
             } else {
                 input.to_string()
             }
-        },
+        }
         "macos" | "linux" => input.replace("\r\n", "\n"),
         _ => panic!("Unsupported platform"),
     };

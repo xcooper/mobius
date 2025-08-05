@@ -19,7 +19,10 @@ pub struct CommandExecutionError {
 }
 
 impl CommandExecutionError {
-    fn new<T>(msg: T) -> Self where T: ToString {
+    fn new<T>(msg: T) -> Self
+    where
+        T: ToString,
+    {
         CommandExecutionError {
             error_message: msg.to_string(),
         }
