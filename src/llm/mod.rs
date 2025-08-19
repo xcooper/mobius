@@ -1,5 +1,6 @@
 mod gemini;
 mod openai;
+mod tools;
 
 use gemini::Gemini;
 

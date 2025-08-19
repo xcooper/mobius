@@ -1,0 +1,21 @@
+use std::{env::consts::OS, os::unix::process::CommandExt, process::Command};
+
+pub(super) fn check_cmd_exist(
+	cmd: &str,
+) -> bool {
+	return match OS {
+		"linux" | "macos" => {
+			let output = Command::new("command")
+				.args(vec!["-v", cmd])
+				.output();
+			return output.is_ok();
+		},
+		"windows" => {
+			let output = Command::new("command")
+				.args(vec!["-v", cmd])
+				.output();
+			return output.is_ok();
+		},
+		_ => false,
+	}
+}

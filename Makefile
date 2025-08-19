@@ -1,4 +1,14 @@
-build-docker:
+SHELL:=bash
+DOCKER:=docker
+.PHONY=build docker-build docker-run
+
+build:
+	cargo build
+
+docker-build: build
 	mkdir -p ./target/
 	cp ~/.config/mobius/config.toml ./target/
-	docker build --tag mobius-test .
+	$(DOCKER) build --tag mobius-test:latest .
+
+docker-run: docker-build
+	$(DOCKER) run --rm -it mobius-test:latest
