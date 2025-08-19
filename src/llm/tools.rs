@@ -11,8 +11,8 @@ pub(super) fn check_cmd_exist(
 			return output.is_ok();
 		},
 		"windows" => {
-			let output = Command::new("command")
-				.args(vec!["-v", cmd])
+			let output = Command::new("Get-Command")
+				.args(vec!["-Name", cmd, "-ErrorAction", "SilentlyContinue"])
 				.output();
 			return output.is_ok();
 		},
