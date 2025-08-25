@@ -13,3 +13,4 @@ tokio = { version = "1.44.1", features = ["full"] }
 reqwest = { version = "0.12.15", features = ["json"] }
 async-trait = "0.1.88"
 chrono = { version = "0.4.41", features = ["serde"] }
+rig-core = "0.18.2"
