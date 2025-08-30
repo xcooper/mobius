@@ -1,6 +1,7 @@
 mod gemini;
 mod openai;
 mod tools;
+mod internal;
 
 use gemini::Gemini;
 
@@ -10,6 +11,7 @@ use crate::model::Provider;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
+pub(self) use internal::convert_to_messages;
 
 #[async_trait]
 pub trait LLM {

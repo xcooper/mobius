@@ -1,4 +1,4 @@
-use std::{env::consts::OS, os::unix::process::CommandExt, process::Command};
+use std::{env::consts::OS, process::Command};
 
 pub(super) fn check_cmd_exist(
 	cmd: &str,

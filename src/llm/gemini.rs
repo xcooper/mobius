@@ -1,51 +1,24 @@
 use async_trait::async_trait;
-use reqwest::Client;
-use serde::{Deserialize, Serialize};
+use rig::{
+    client::CompletionClient,
+    completion::{CompletionModel, CompletionRequest},
+    message::AssistantContent,
+    providers::gemini::Client as RigClient,
+};
 
-use super::LLM;
-use crate::config::Config;
-
-const DEFAULT_API_URL: &str = "https://generativelanguage.googleapis.com/";
+use crate::{
+    config::Config,
+    llm::{convert_to_messages, LLM},
+};
 
 pub struct Gemini<'a> {
     config: &'a Config,
-    client: Client,
 }
 
 impl<'a> Gemini<'a> {
     pub fn new(config: &'a Config) -> Self {
-        Gemini {
-            config,
-            client: reqwest::Client::new(),
-        }
+        Gemini { config }
     }
-}
-
-#[derive(Serialize, Deserialize)]
-struct Part {
-    text: String,
-}
-
-#[derive(Serialize, Deserialize)]
-struct Content {
-    parts: Vec<Part>,
-    role: String,
-}
-
-#[derive(Serialize)]
-struct GeminiReq {
-    contents: Vec<Content>,
-    system_instruction: Content,
-}
-
-#[derive(Deserialize)]
-struct Candidate {
-    content: Content,
-}
-
-#[derive(Deserialize)]
-struct GeminiResp {
-    candidates: Vec<Candidate>,
 }
 
 #[async_trait]
@@ -55,41 +28,28 @@ impl LLM for Gemini<'_> {
         system_prompt: &str,
         user_prompts: Vec<&str>,
     ) -> Result<String, Box<dyn std::error::Error>> {
-        let api_key = self.config.llm.api_key.as_ref().unwrap();
-        let model = &self.config.llm.model;
-        let def_val = &DEFAULT_API_URL.to_string();
-        let api_url = self.config.llm.url.as_ref().unwrap_or(def_val);
-        let input = concat_parts(system_prompt, user_prompts);
-        let req = self
-            .client
-            .post(format!("{api_url}/v1beta/models/{model}:generateContent"))
-            .header("Content-Type", "application/json")
-            .query(&[("key", api_key)])
-            .json(&GeminiReq {
-                system_instruction: input.0,
-                contents: input.1,
+        let llm = &self.config.llm;
+        let api_key = llm.api_key.clone().unwrap();
+        let model = llm.model.clone();
+        let client = RigClient::new(&api_key);
+        let gemini = client.completion_model(&model);
+        let req = CompletionRequest {
+            preamble: Some(system_prompt.to_string()),
+            chat_history: convert_to_messages(user_prompts),
+            documents: Vec::new(),
+            tools: Vec::new(),
+            temperature: Some(llm.default_temperature),
+            max_tokens: None,
+            additional_params: None,
+        };
+        let resp = gemini.completion(req);
+        resp.await
+            .map(|r| r.choice)
+            .map(|o| o.first())
+            .map(|a| match a {
+                AssistantContent::Text(text) => text.text,
+                _ => String::new(),
             })
-            .build()?;
-        let gemini_resp: GeminiResp = self.client.execute(req).await?.json().await?;
-        return Ok(gemini_resp.candidates[0].content.parts[0].text.clone());
+            .map_err(|ce| Box::from(ce))
     }
-}
-
-fn concat_parts(sys_prompt: &str, user_prompts: Vec<&str>) -> (Content, Vec<Content>) {
-    let sys_content = Content {
-        parts: vec![Part {
-            text: sys_prompt.to_string(),
-        }],
-        role: "model".to_string(),
-    };
-    let mut user_contents: Vec<Content> = Vec::new();
-    for user_prompt in user_prompts {
-        user_contents.push(Content {
-            parts: vec![Part {
-                text: user_prompt.to_string(),
-            }],
-            role: "user".to_string(),
-        });
-    }
-    return (sys_content, user_contents);
 }
