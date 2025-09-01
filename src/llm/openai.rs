@@ -7,7 +7,7 @@ use rig::client::CompletionClient;
 use rig::completion::{CompletionModel, CompletionRequest};
 
 use rig::completion::message::AssistantContent;
-use rig::providers::openai::Client as RigClient;
+use rig::providers::openai::Client;
 
 pub struct OpenAI<'a> {
     config: &'a Config,
@@ -29,7 +29,7 @@ impl LLM for OpenAI<'_> {
         let llm = &self.config.llm;
         let api_key = llm.api_key.as_ref().unwrap();
         let model = llm.model.clone();
-        let client = RigClient::new(&api_key);
+        let client = Client::new(&api_key);
         let gpt = client.completion_model(model.as_str());
         let req = CompletionRequest {
             preamble: Some(system_prompt.to_string()),

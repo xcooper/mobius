@@ -9,7 +9,6 @@ use crate::config::Config;
 use crate::llm::openai::OpenAI;
 use crate::model::Provider;
 use async_trait::async_trait;
-use serde::{Deserialize, Serialize};
 use std::error::Error;
 pub(self) use internal::convert_to_messages;
 
@@ -20,20 +19,6 @@ pub trait LLM {
         system_prompt: &str,
         user_prompts: Vec<&str>,
     ) -> Result<String, Box<dyn Error>>;
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-enum Role {
-    System,
-    User,
-    Assistant,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Message {
-    role: Role,
-    content: String,
 }
 
 pub fn get_llm(config: &Config) -> Box<dyn LLM + '_> {

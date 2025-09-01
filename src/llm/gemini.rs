@@ -3,7 +3,7 @@ use rig::{
     client::CompletionClient,
     completion::{CompletionModel, CompletionRequest},
     message::AssistantContent,
-    providers::gemini::Client as RigClient,
+    providers::gemini::Client,
 };
 
 use crate::{
@@ -31,7 +31,7 @@ impl LLM for Gemini<'_> {
         let llm = &self.config.llm;
         let api_key = llm.api_key.clone().unwrap();
         let model = llm.model.clone();
-        let client = RigClient::new(&api_key);
+        let client = Client::new(&api_key);
         let gemini = client.completion_model(&model);
         let req = CompletionRequest {
             preamble: Some(system_prompt.to_string()),
