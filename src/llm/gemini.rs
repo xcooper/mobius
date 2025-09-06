@@ -3,7 +3,10 @@ use rig::{
     client::CompletionClient,
     completion::{CompletionModel, CompletionRequest},
     message::AssistantContent,
-    providers::gemini::Client,
+    providers::gemini::{
+        completion::gemini_api_types::{AdditionalParameters, GenerationConfig},
+        Client,
+    },
 };
 
 use crate::{
@@ -40,7 +43,7 @@ impl LLM for Gemini<'_> {
             tools: Vec::new(),
             temperature: Some(llm.default_temperature),
             max_tokens: None,
-            additional_params: None,
+            additional_params: serde_json::to_value(AdditionalParameters::default()).ok(),
         };
         let resp = gemini.completion(req);
         resp.await

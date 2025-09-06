@@ -1,4 +1,4 @@
-FROM rust:1.86.0 AS builder
+FROM rust:1.89.0 AS builder
 ARG PWSH_DNLD_URL=https://github.com/PowerShell/PowerShell/releases/download/v7.4.11/powershell-7.4.11-linux-arm64.tar.gz
 # workaround, this is a bug
 ENV HOME=/root
