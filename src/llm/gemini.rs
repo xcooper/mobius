@@ -4,7 +4,7 @@ use rig::{
     completion::{CompletionModel, CompletionRequest},
     message::AssistantContent,
     providers::gemini::{
-        completion::gemini_api_types::{AdditionalParameters, GenerationConfig},
+        completion::gemini_api_types::AdditionalParameters,
         Client,
     },
 };
