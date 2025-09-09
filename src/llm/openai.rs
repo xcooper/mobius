@@ -1,12 +1,13 @@
 use std::error::Error;
 
 use crate::config::Config;
-use crate::llm::{convert_to_messages, LLM};
+use crate::llm::internal::split_prompt_and_history;
+use crate::llm::tools::CheckCmdExist;
+use crate::llm::LLM;
 use async_trait::async_trait;
 use rig::client::CompletionClient;
-use rig::completion::{CompletionModel, CompletionRequest};
 
-use rig::completion::message::AssistantContent;
+use rig::completion::Chat;
 use rig::providers::openai::Client;
 
 pub struct OpenAI<'a> {
@@ -18,7 +19,6 @@ impl<'a> OpenAI<'a> {
         OpenAI { config }
     }
 }
-
 #[async_trait]
 impl LLM for OpenAI<'_> {
     async fn chat(
@@ -30,24 +30,30 @@ impl LLM for OpenAI<'_> {
         let api_key = llm.api_key.as_ref().unwrap();
         let model = llm.model.clone();
         let client = Client::new(&api_key);
-        let gpt = client.completion_model(model.as_str());
-        let req = CompletionRequest {
-            preamble: Some(system_prompt.to_string()),
-            chat_history: convert_to_messages(user_prompts),
-            documents: Vec::new(),
-            tools: Vec::new(),
-            temperature: Some(llm.default_temperature),
-            max_tokens: None,
-            additional_params: None,
-        };
-        let resp = gpt.completion(req);
-        resp.await
-            .map(|r| r.choice)
-            .map(|o| o.first())
-            .map(|a| match a {
-                AssistantContent::Text(text) => text.text,
-                _ => String::new(),
-            })
-            .map_err(|ce| Box::from(ce))
+        let prompt_histories = split_prompt_and_history(user_prompts);
+        let last_user_prompt = prompt_histories.0.unwrap();
+        let agent = client.agent(&model).preamble(system_prompt).build();
+        let resp = agent.chat(last_user_prompt, Vec::new()).await;
+        resp.map_err(|e| Box::from(e))
+    }
+
+    async fn exec(
+        &self,
+        system_prompt: &str,
+        user_prompts: Vec<&str>,
+    ) -> Result<String, Box<dyn Error>> {
+        let llm = &self.config.llm;
+        let api_key = llm.api_key.as_ref().unwrap();
+        let model = llm.model.clone();
+        let client = Client::new(&api_key);
+        let prompt_histories = split_prompt_and_history(user_prompts);
+        let last_user_prompt = prompt_histories.0.unwrap();
+        let agent = client
+            .agent(&model)
+            .tool(CheckCmdExist)
+            .preamble(system_prompt)
+            .build();
+        let resp = agent.chat(last_user_prompt, Vec::new()).await;
+        resp.map_err(|e| Box::from(e))
     }
 }

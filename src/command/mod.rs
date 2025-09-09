@@ -65,6 +65,40 @@ pub async fn do_chat(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
     Err(CommandExecutionError::new("invalid command"))
 }
 
+pub async fn do_exec(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
+    let cmd = &args.command;
+    let config = load_config()
+        .map_err(|e| CommandExecutionError::new(format!("can not load config: {}", e)))?;
+    if let Commands::Exec {
+        prompt,
+        system_prompt,
+    } = cmd
+    {
+        let mut user_prompt = String::from(prompt);
+        if prompt == "-" {
+            let mut stdin = stdin().lock();
+            stdin
+                .read_to_string(&mut user_prompt)
+                .map_err(|_| CommandExecutionError::new("can not read stdin"))?;
+        }
+        let llm = get_llm(&config);
+        return match llm
+            .chat(
+                system_prompt.as_ref().map_or(&default_sys_prompt(), |v| v),
+                vec![&user_prompt],
+            )
+            .await
+        {
+            Ok(o) => {
+                echo!(o);
+                Ok(())
+            }
+            Err(e) => Err(CommandExecutionError::new(format!("{:?}", e))),
+        };
+    }
+    Err(CommandExecutionError::new("invalid command"))
+}
+
 pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
     if let Commands::AutoComplete { shell } = &args.command {
         return match env::consts::OS {

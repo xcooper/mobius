@@ -5,7 +5,7 @@ _mobius_completer() {
   if [[ "$line_before_cursor" == *ai:* ]]; then
     local before_ai=${line_before_cursor##ai:*}
     local after_ai=${line_before_cursor##*ai:}
-    local ai_resp=$(mobius chat \
+    local ai_resp=$(mobius exec \
         --prompt "$after_ai" \
         --system-prompt "Be a Linux shell command assistant, \
             only response with command, \

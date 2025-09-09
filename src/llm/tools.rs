@@ -5,15 +5,15 @@ use serde_json::json;
 
 use crate::CommandExecutionError;
 
-struct CheckCmdExist;
+pub(super) struct CheckCmdExist;
 
 impl Tool for CheckCmdExist {
     const NAME: &'static str = "check_cmd_exist";
-    
+
     type Error = CommandExecutionError;
-    
+
     type Args = String;
-    
+
     type Output = bool;
 
     async fn definition(&self, _prompt: String) -> ToolDefinition {
@@ -33,10 +33,7 @@ impl Tool for CheckCmdExist {
         }
     }
 
-    async fn call(
-        &self,
-        args: Self::Args,
-    ) -> Result<Self::Output, Self::Error> {
+    async fn call(&self, args: Self::Args) -> Result<Self::Output, Self::Error> {
         let cmd = args;
         return match OS {
             "linux" | "macos" => {

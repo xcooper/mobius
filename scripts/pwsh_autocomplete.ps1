@@ -21,7 +21,7 @@ function global:TriggerMobius {
         $afterAi = $lineCursor.Substring($lineCursor.LastIndexOf("ai:") + 3)
         
         # Process with mobius pipe
-        $aiResponse = & mobius chat --prompt "$afterAi" --system-prompt "Be a Windows power shell assistant, only response with command, no wrap, no format, be concise."
+        $aiResponse = & mobius exec --prompt "$afterAi" --system-prompt "Be a Windows power shell assistant, only response with command, no wrap, no format, be concise."
         $trimmedAiResponse = $aiResponse -replace "(?s)^```[a-zA-Z0-9]*\\n?", ''
         $trimmedAiResponse = $trimmedAiResponse -replace "```$", ''
         

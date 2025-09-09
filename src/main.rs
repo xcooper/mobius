@@ -1,7 +1,7 @@
 use clap::Parser;
 use log::error;
 use mobius::args_parser::{Commands, ParsedArgs};
-use mobius::command::{do_autocomplete, do_chat, do_init};
+use mobius::command::{do_autocomplete, do_chat, do_exec, do_init};
 
 #[tokio::main]
 async fn main() {
@@ -18,6 +18,11 @@ async fn main() {
         }
         Commands::Chat { .. } => {
             if let Err(e) = do_chat(&args).await {
+                error!("{}", e);
+            }
+        }
+        Commands::Exec { .. } => {
+            if let Err(e) = do_exec(&args).await {
                 error!("{}", e);
             }
         }

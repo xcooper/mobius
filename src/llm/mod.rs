@@ -9,12 +9,17 @@ use crate::config::Config;
 use crate::llm::openai::OpenAI;
 use crate::model::Provider;
 use async_trait::async_trait;
-pub(self) use internal::convert_to_messages;
 use std::error::Error;
 
 #[async_trait]
 pub trait LLM {
     async fn chat(
+        &self,
+        system_prompt: &str,
+        user_prompts: Vec<&str>,
+    ) -> Result<String, Box<dyn Error>>;
+
+    async fn exec(
         &self,
         system_prompt: &str,
         user_prompts: Vec<&str>,

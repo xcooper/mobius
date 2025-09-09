@@ -1,18 +1,12 @@
-use async_trait::async_trait;
-use rig::{
-    client::CompletionClient,
-    completion::{CompletionModel, CompletionRequest},
-    message::AssistantContent,
-    providers::gemini::{
-        completion::gemini_api_types::AdditionalParameters,
-        Client,
-    },
-};
+use std::error::Error;
 
-use crate::{
-    config::Config,
-    llm::{convert_to_messages, LLM},
-};
+use async_trait::async_trait;
+use rig::providers::gemini::{completion::gemini_api_types::AdditionalParameters, Client};
+use rig::{client::CompletionClient, completion::Chat};
+use serde_json::to_value;
+
+use crate::config::Config;
+use crate::llm::{internal::split_prompt_and_history, tools::CheckCmdExist, LLM};
 
 pub struct Gemini<'a> {
     config: &'a Config,
@@ -30,29 +24,40 @@ impl LLM for Gemini<'_> {
         &self,
         system_prompt: &str,
         user_prompts: Vec<&str>,
-    ) -> Result<String, Box<dyn std::error::Error>> {
+    ) -> Result<String, Box<dyn Error>> {
         let llm = &self.config.llm;
         let api_key = llm.api_key.clone().unwrap();
         let model = llm.model.clone();
         let client = Client::new(&api_key);
-        let gemini = client.completion_model(&model);
-        let req = CompletionRequest {
-            preamble: Some(system_prompt.to_string()),
-            chat_history: convert_to_messages(user_prompts),
-            documents: Vec::new(),
-            tools: Vec::new(),
-            temperature: Some(llm.default_temperature),
-            max_tokens: None,
-            additional_params: serde_json::to_value(AdditionalParameters::default()).ok(),
-        };
-        let resp = gemini.completion(req);
-        resp.await
-            .map(|r| r.choice)
-            .map(|o| o.first())
-            .map(|a| match a {
-                AssistantContent::Text(text) => text.text,
-                _ => String::new(),
-            })
-            .map_err(|ce| Box::from(ce))
+        let prompt_histories = split_prompt_and_history(user_prompts);
+        let last_user_prompt = prompt_histories.0.unwrap();
+        let agent = client
+            .agent(&model)
+            .preamble(system_prompt)
+            .additional_params(to_value(AdditionalParameters::default()).unwrap())
+            .build();
+        let resp = agent.chat(last_user_prompt, Vec::new()).await;
+        resp.map_err(|e| Box::from(e))
+    }
+
+    async fn exec(
+        &self,
+        system_prompt: &str,
+        user_prompts: Vec<&str>,
+    ) -> Result<String, Box<dyn Error>> {
+        let llm = &self.config.llm;
+        let api_key = llm.api_key.clone().unwrap();
+        let model = llm.model.clone();
+        let client = Client::new(&api_key);
+        let prompt_histories = split_prompt_and_history(user_prompts);
+        let last_user_prompt = prompt_histories.0.unwrap();
+        let agent = client
+            .agent(&model)
+            .preamble(system_prompt)
+            .tool(CheckCmdExist)
+            .additional_params(to_value(AdditionalParameters::default()).unwrap())
+            .build();
+        let resp = agent.chat(last_user_prompt, Vec::new()).await;
+        resp.map_err(|e| Box::from(e))
     }
 }
