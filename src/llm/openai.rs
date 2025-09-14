@@ -7,7 +7,7 @@ use crate::llm::LLM;
 use async_trait::async_trait;
 use rig::client::CompletionClient;
 
-use rig::completion::{Chat, Prompt};
+use rig::completion::Chat;
 use rig::providers::openai::Client;
 
 pub struct OpenAI<'a> {
@@ -59,8 +59,7 @@ impl LLM for OpenAI<'_> {
             .temperature(llm.default_temperature)
             .build();
         let resp = agent
-            .prompt(last_user_prompt)
-            .multi_turn(25)
+            .chat(last_user_prompt, vec![])
             .await;
         resp.map_err(|e| Box::from(e))
     }

@@ -59,7 +59,7 @@ impl LLM for Gemini<'_> {
             .temperature(llm.default_temperature)
             .additional_params(to_value(AdditionalParameters::default()).unwrap())
             .build();
-        let resp = agent.chat(last_user_prompt, Vec::new()).await;
+        let resp = agent.chat(last_user_prompt, vec![]).await;
         resp.map_err(|e| Box::from(e))
     }
 }

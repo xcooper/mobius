@@ -5,7 +5,7 @@ use rig::{completion::ToolDefinition, tool::Tool};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::CommandExecutionError;
+use crate::{debug, CommandExecutionError};
 
 pub(super) struct CheckCmdExist;
 
@@ -73,6 +73,7 @@ impl Tool for CheckCmdExist {
             let single_result = self.check_single_cmd(cmd)?;
             all_results.insert(cmd.clone(), single_result);
         }
+        debug!(format!("check existing commands: {:?}", all_results));
         Ok(CheckCmdExistResp { result: all_results })
     }
 }
