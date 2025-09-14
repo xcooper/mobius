@@ -83,7 +83,7 @@ pub async fn do_exec(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
         }
         let llm = get_llm(&config);
         return match llm
-            .chat(
+            .exec(
                 system_prompt.as_ref().map_or(&default_sys_prompt(), |v| v),
                 vec![&user_prompt],
             )

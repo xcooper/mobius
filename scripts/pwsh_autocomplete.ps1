@@ -21,7 +21,14 @@ function global:TriggerMobius {
         $afterAi = $lineCursor.Substring($lineCursor.LastIndexOf("ai:") + 3)
         
         # Process with mobius pipe
-        $aiResponse = & mobius exec --prompt "$afterAi" --system-prompt "Be a Windows power shell assistant, only response with command, no wrap, no format, be concise."
+        $systemPrompt = @"
+You are a Windows power shell assistant. \
+Given a user request, generate shell commands that fulfills the requirement. \
+Before suggesting commands, use the provided tool to check if the commands exist on the user's system. \
+Only respond with valid commands. \
+Do not wrap, format, or explain the command—output only the command itself.
+"@
+        $aiResponse = & mobius exec --prompt "$afterAi" --system-prompt $systemPrompt
         $trimmedAiResponse = $aiResponse -replace "(?s)^```[a-zA-Z0-9]*\\n?", ''
         $trimmedAiResponse = $trimmedAiResponse -replace "```$", ''
         

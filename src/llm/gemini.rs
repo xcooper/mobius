@@ -34,6 +34,7 @@ impl LLM for Gemini<'_> {
         let agent = client
             .agent(&model)
             .preamble(system_prompt)
+            .temperature(llm.default_temperature)
             .additional_params(to_value(AdditionalParameters::default()).unwrap())
             .build();
         let resp = agent.chat(last_user_prompt, Vec::new()).await;
@@ -55,6 +56,7 @@ impl LLM for Gemini<'_> {
             .agent(&model)
             .preamble(system_prompt)
             .tool(CheckCmdExist)
+            .temperature(llm.default_temperature)
             .additional_params(to_value(AdditionalParameters::default()).unwrap())
             .build();
         let resp = agent.chat(last_user_prompt, Vec::new()).await;

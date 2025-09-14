@@ -7,7 +7,7 @@ use crate::llm::LLM;
 use async_trait::async_trait;
 use rig::client::CompletionClient;
 
-use rig::completion::Chat;
+use rig::completion::{Chat, Prompt};
 use rig::providers::openai::Client;
 
 pub struct OpenAI<'a> {
@@ -32,7 +32,11 @@ impl LLM for OpenAI<'_> {
         let client = Client::new(&api_key);
         let prompt_histories = split_prompt_and_history(user_prompts);
         let last_user_prompt = prompt_histories.0.unwrap();
-        let agent = client.agent(&model).preamble(system_prompt).build();
+        let agent = client
+            .agent(&model)
+            .temperature(llm.default_temperature)
+            .preamble(system_prompt)
+            .build();
         let resp = agent.chat(last_user_prompt, Vec::new()).await;
         resp.map_err(|e| Box::from(e))
     }
@@ -52,8 +56,12 @@ impl LLM for OpenAI<'_> {
             .agent(&model)
             .tool(CheckCmdExist)
             .preamble(system_prompt)
+            .temperature(llm.default_temperature)
             .build();
-        let resp = agent.chat(last_user_prompt, Vec::new()).await;
+        let resp = agent
+            .prompt(last_user_prompt)
+            .multi_turn(25)
+            .await;
         resp.map_err(|e| Box::from(e))
     }
 }

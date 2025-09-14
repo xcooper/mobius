@@ -13,9 +13,11 @@ _mobius_completer() {
     # Run the mobius command with the text after "ai:"
     local ai_resp=$(mobius exec \
       --prompt "$after_ai" \
-      --system-prompt "Be a Linux shell command assistant, \
-            only response with command, \
-            no wrap, no format, be concise.")
+      --system-prompt "You are a Linux shell command assistant. \
+Given a user request, generate shell commands that fulfills the requirement. \
+Before suggesting commands, use the provided tool to check if the commands exist on the user's system. \
+Only respond with valid commands. \
+Do not wrap, format, or explain the command—output only the command itself.")
     unwrapped_ai_resp=$(echo ${ai_resp} | sed -E '/^`+[a-z]*$/d; /^`+$/d')
 
     # Reconstruct the command line
