@@ -1,3 +1,4 @@
+use std::env;
 use clap::Parser;
 use log::error;
 use mobius::args_parser::{Commands, ParsedArgs};
@@ -5,7 +6,10 @@ use mobius::command::{do_autocomplete, do_chat, do_exec, do_init};
 
 #[tokio::main]
 async fn main() {
-    let args = ParsedArgs::parse();
+    let mut args = ParsedArgs::parse();
+    if env::var("DEBUG").is_ok() {
+        args.verbose = 3;
+    }
     stderrlog::new()
         .verbosity(args.verbose as usize)
         .init()

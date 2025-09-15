@@ -11,17 +11,8 @@ macro_rules! echo {
         println!("{}", $arg);
     };
 }
-macro_rules! debug {
-    ($arg:expr) => {
-        let is_debug = std::env::var("DEBUG").is_ok();
-        if is_debug {
-            eprintln!("{}", $arg);
-        }
-    };
-}
 
 pub(crate) use echo;
-pub(crate) use debug;
 
 #[derive(Debug)]
 pub struct CommandExecutionError {

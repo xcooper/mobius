@@ -1,7 +1,7 @@
 FROM rust:1.89.0 AS builder
 ARG PWSH_DNLD_URL=https://github.com/PowerShell/PowerShell/releases/download/v7.4.11/powershell-7.4.11-linux-arm64.tar.gz
-# workaround, this is a bug
-ENV HOME=/root
+ENV RUST_BACKTRACE=1
+ENV DEBUG=1
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 	--mount=type=cache,target=/var/lib/apt,sharing=locked \
 	set -xeo; \

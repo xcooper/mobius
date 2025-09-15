@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 use std::{env::consts::OS, process::Command};
-
+use log::debug;
 use rig::{completion::ToolDefinition, tool::Tool};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::{debug, CommandExecutionError};
+use crate::CommandExecutionError;
 
 pub(super) struct CheckCmdExist;
 
@@ -21,6 +21,7 @@ pub struct CheckCmdExistResp {
 
 impl CheckCmdExist {
     fn check_single_cmd(&self, cmd: &str) -> Result<bool, CommandExecutionError> {
+        debug!("checking cmd: {}", cmd);
         match OS {
             "linux" | "macos" => {
                 Command::new("command")
@@ -36,7 +37,7 @@ impl CheckCmdExist {
                     .map(|out| out.status.success())
                     .map_err(|e| CommandExecutionError::new(e))
             }
-            _ => Ok(false),
+            _ => panic!("Unsupported OS"),
         }
     }
 }
@@ -73,7 +74,7 @@ impl Tool for CheckCmdExist {
             let single_result = self.check_single_cmd(cmd)?;
             all_results.insert(cmd.clone(), single_result);
         }
-        debug!(format!("check existing commands: {:?}", all_results));
+        debug!("check command results: {:?}", all_results);
         Ok(CheckCmdExistResp { result: all_results })
     }
 }

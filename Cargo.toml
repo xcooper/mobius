@@ -7,12 +7,10 @@ edition = "2021"
 clap = { version = "4.5.30", features = ["derive"] }
 serde = { version = "1.0.218", features = ["derive"] }
 stderrlog = "0.6.0"
-toml = "0.8.20"
+toml = "0.9.6"
 log = "0.4.25"
 tokio = { version = "1.44.1", features = ["full"] }
-reqwest = { version = "0.12.15", features = ["json"] }
 async-trait = "0.1.88"
-chrono = { version = "0.4.41", features = ["serde"] }
 rig-core = "0.19.0"
 serde_json = "1.0.143"
 
