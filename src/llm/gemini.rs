@@ -1,6 +1,7 @@
 use std::error::Error;
 
 use async_trait::async_trait;
+use rig::completion::Prompt;
 use rig::providers::gemini::{completion::gemini_api_types::AdditionalParameters, Client};
 use rig::{client::CompletionClient, completion::Chat};
 use serde_json::to_value;
@@ -59,7 +60,7 @@ impl LLM for Gemini<'_> {
             .temperature(llm.default_temperature)
             .additional_params(to_value(AdditionalParameters::default()).unwrap())
             .build();
-        let resp = agent.chat(last_user_prompt, vec![]).await;
+        let resp = agent.prompt(last_user_prompt).multi_turn(25).await;
         resp.map_err(|e| Box::from(e))
     }
 }

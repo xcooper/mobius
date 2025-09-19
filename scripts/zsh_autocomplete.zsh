@@ -1,5 +1,29 @@
 [ $(command -v mobius) ] || return 1
 
+# Detect operating system and set OS environment variable
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  export OS=macos
+  # Export macOS version information
+  if command -v sw_vers >/dev/null 2>&1; then
+    export OS_RELEASE=$(sw_vers -productName)
+  fi
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  export OS=linux
+  # Export Linux release name if os-release file exists
+  if [[ -f /etc/os-release ]]; then
+    export OS_RELEASE=$(. /etc/os-release && echo $NAME)
+  fi
+elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
+  export OS=windows
+  # Export Windows OS name if systeminfo command exists
+  if command -v systeminfo >/dev/null 2>&1; then
+    export OS_RELEASE=$(systeminfo | grep -i "OS Name:" | sed 's/^.*://; s/^ *//')
+  fi
+else
+  echo "Your OS is not supported: $OSTYPE" >&2
+  return 255
+fi
+
 _mobius_completer() {
   local line_before_cursor="${BUFFER:0:$CURSOR}"
   if [[ "$line_before_cursor" == *ai:* ]]; then
@@ -7,11 +31,12 @@ _mobius_completer() {
     local after_ai=${line_before_cursor##*ai:}
   local ai_resp=$(mobius exec \
     --prompt "$after_ai" \
-    --system-prompt "You are a Linux shell command assistant. \
-Given a user request, generate shell commands that fulfills the requirement. \
-Before suggesting commands, use the provided tool to check if the commands exist on the user's system. \
+    --system-prompt "You are a Zsh command assistant. \
+Given a user request, generate one or more shell commands that fulfill the requirement. \
+Separate multiple commands with semicolons (;) on a single line. \
+You MUST use the 'check_cmd_exist' tool to verify that all commands are available and valid for $OS($OS_RELEASE) before suggesting them. \
 Only respond with valid commands. \
-Do not wrap, format, or explain the command—output only the command itself.")
+Do not wrap in code blocks, format, or explain - output only the command(s) themselves.")
     unwrapped_ai_resp=$(echo ${ai_resp} | sed -E '/^`+[a-z]*$/d; /^`+$/d')
     BUFFER="${before_ai}${unwrapped_ai_resp}"
   fi

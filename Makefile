@@ -5,7 +5,7 @@ DOCKER:=docker
 build:
 	cargo build
 
-docker-build: build
+docker-build:
 	mkdir -p ./target/
 	cp ~/.config/mobius/config.toml ./target/
 	$(DOCKER) build --tag mobius-test:latest .
