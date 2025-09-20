@@ -24,6 +24,13 @@ else
   return 255
 fi
 
+# Set USER to 'root user' if UID is 0, otherwise 'user'
+if [[ "$UID" == "0" ]]; then
+  export USER="root user"
+else
+  export USER="user"
+fi
+
 _mobius_completer() {
   # Get the command line up to the cursor position
   local line_before_cursor="${READLINE_LINE:0:$READLINE_POINT}"
@@ -41,8 +48,10 @@ _mobius_completer() {
 Given a user request, generate one or more shell commands that fulfill the requirement. \
 Separate multiple commands with semicolons (;) on a single line. \
 You MUST use the 'check_cmd_exist' tool to verify that all commands are available and valid for $OS($OS_RELEASE) before suggesting them. \
-Only respond with valid commands. \
-Do not wrap in code blocks, format, or explain - output only the command(s) themselves.")
+Only respond with valid commands for a $USER. \
+Do not wrap in code blocks, format, or explain - output only the command(s) themselves. \
+Let's do this step by step. \
+")
     unwrapped_ai_resp=$(echo ${ai_resp} | sed -E '/^`+[a-z]*$/d; /^`+$/d')
 
     # Reconstruct the command line
