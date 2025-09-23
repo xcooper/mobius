@@ -16,16 +16,14 @@ mobius init --provider gemini --api-key AIza... --model gemini-2.0-flash
 
 ### Shell Auto Complete
 
-Enable AI-powered auto-completion triggered by the `CTRL+/` key with the prefix `ai:`. The AI-generated commands will
-consider your operating system.
+Enable AI-powered auto-completion triggered by the `CTRL+/` key with the prefix `ai:`. The AI-generated commands will consider your operating system.
 
-Example: Typing `ai:find foobar in all files` will return `grep -R foobar` on Linux.
+[![asciicast](https://asciinema.org/a/MXys48AzqtkBTAfgd2jIK7eEj.svg)](https://asciinema.org/a/MXys48AzqtkBTAfgd2jIK7eEj)
 
 > Note: The AI-generated commands are based on public knowledge. Verify them before pressing ENTER.
 > Powershell on Linux is not supported.
 
-To enable *AutoComplete*, add **Mobius** to your shell initialization file. Instructions for different platforms are
-below:
+To enable *AutoComplete*, add **Mobius** to your shell initialization file. Instructions for different platforms are below:
 
 #### Windows
 
@@ -36,7 +34,7 @@ Edit your PowerShell profile `$PROFILE` (e.g.,
 Invoke-Expression -Command (mobius auto-complete --shell power-shell | Out-String)
 ```
 
-#### Linux
+#### Linux or MAC
 
 Edit the shell initialization file for your shell:
 
@@ -76,19 +74,3 @@ The configuration file is located in one of the following paths:
     * `$XDG_CONFIG_HOME/mobius/config.toml` (default: `~/.config/mobius/config.toml`)
 * Windows:
   * `%APPDATA%\mobius\config.toml`
-
-## TODOs
-
-- [X] Let AI processing the input and produce meaningful output
-- [X] Ask AI generating a command based your prompt
-- [ ] Have a tool checking the existence of commands on user's local.
-- [ ] Call other commands based on AI response
-- [ ] Manage prompts
-- [X] Trigger AI generating a command using auto-complete(CTRL+/ key)
-  - [X] Windows PowerShell
-  - [X] Linux ZSH
-  - [X] Linux BASH
-  - [X] MAC ZSH
-- [X] Support more LLM
-  - [X] OpenAI
-  - [X] Gemini
