@@ -1,2 +1,6 @@
-/target/debug
-/target/release
+/target/**
+!/target/config.toml
+/.github
+/.idea
+/.vscode
+/tests

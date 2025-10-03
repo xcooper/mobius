@@ -52,4 +52,10 @@ Let's do this step by step. \
 }
 
 zle -N mobius_completer _mobius_completer
-bindkey '^_' mobius_completer
+# Bind key to our custom function based on MOBIUS_KEY_BINDING env var
+# Default is Ctrl+/ (^_), alternative is Alt+/ (\e/)
+if [[ "${MOBIUS_KEY_BINDING}" == "ALT_SLASH" ]]; then
+  bindkey '\e/' mobius_completer
+else
+  bindkey '^_' mobius_completer
+fi

@@ -1,3 +1,4 @@
+use crate::model::HotKey;
 use crate::model::Provider;
 use crate::model::Shell;
 use clap::command;
@@ -56,7 +57,12 @@ pub enum Commands {
         about = "Generate CLI auto-complete script based on the OS and the shell"
     )]
     AutoComplete {
-        #[arg(long)]
+        #[arg(long, help = "The shell to inject the auto-complete")]
         shell: Option<Shell>,
+        #[arg(
+            long,
+            help = "The default hot-key is CTRL+/.  Can set to ALT+/ if the default key does not work."
+        )]
+        hot_key: Option<HotKey>,
     },
 }

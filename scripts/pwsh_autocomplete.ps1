@@ -61,5 +61,10 @@ Let's do this step by step.
     }
 }
 
-# Set the PSReadLine key handler
-Set-PSReadLineKeyHandler -Chord 'Alt+/' -ScriptBlock $function:TriggerMobius
+# Set the PSReadLine key handler based on MOBIUS_KEY_BINDING env var
+# Default is Ctrl+/, alternative is Alt+/
+if ($MOBIUS_KEY_BINDING -eq "ALT_SLASH") {
+    Set-PSReadLineKeyHandler -Chord 'Alt+/' -ScriptBlock $function:TriggerMobius
+} else {
+    Set-PSReadLineKeyHandler -Chord 'Ctrl+/' -ScriptBlock $function:TriggerMobius
+}

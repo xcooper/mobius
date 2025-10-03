@@ -1,5 +1,5 @@
 FROM rust:1.89.0 AS builder
-ARG PWSH_DNLD_URL=https://github.com/PowerShell/PowerShell/releases/download/v7.4.11/powershell-7.4.11-linux-arm64.tar.gz
+ARG PWSH_DNLD_URL=https://github.com/PowerShell/PowerShell/releases/download/v7.5.3/powershell-7.5.3-linux-arm64.tar.gz
 ENV RUST_BACKTRACE=1
 ENV DEBUG=1
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -12,10 +12,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 	apt-get update; \
     apt-get install -y bash; \
     apt-get install -y zsh; \
-	echo "source <(mobius auto-complete --shell zsh)" >> ~/.zshrc; \
-	echo "source <(mobius auto-complete --shell bash)" >> ~/.bashrc; \
+	echo "source <(mobius auto-complete --shell zsh --hot-key ctrl-slash)" >> ~/.zshrc; \
+	echo "source <(mobius auto-complete --shell bash --hot-key ctrl-slash)" >> ~/.bashrc; \
 	mkdir -p ~/.config/powershell/; \
-	echo "Invoke-Expression -Command (mobius auto-complete --shell power-shell | Out-String)" >> ~/.config/powershell/Microsoft.PowerShell_profile.ps1;
+	echo "Invoke-Expression -Command (mobius auto-complete --shell power-shell --hot-key alt-slash | Out-String)" >> ~/.config/powershell/Microsoft.PowerShell_profile.ps1;
 COPY . /src
 RUN --mount=type=cache,target=/root/.cargo \
 	cd /src; \

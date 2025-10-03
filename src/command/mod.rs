@@ -1,7 +1,7 @@
 use crate::args_parser::{Commands, ParsedArgs};
 use crate::config::{default_config, load_config, save_config};
 use crate::llm::get_llm;
-use crate::model::Shell;
+use crate::model::{HotKey, Shell};
 use crate::{echo, CommandExecutionError};
 use std::env;
 use std::io::{stdin, Read};
@@ -100,27 +100,27 @@ pub async fn do_exec(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
 }
 
 pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
-    if let Commands::AutoComplete { shell } = &args.command {
+    if let Commands::AutoComplete { shell, hot_key } = &args.command {
+        let env_val = hot_key
+            .as_ref()
+            .map_or(HotKey::CtrlSlash.to_env(), HotKey::to_env);
         return match env::consts::OS {
             "linux" => {
                 if let Some(s) = shell {
                     return if s == &Shell::Bash {
-                        echo!(ensure_eol(
+                        echo!(format!("MOBIUS_KEY_BINDING={}", env_val));
+                        fix_eof(
                             include_str!("../../scripts/bash_autocomplete.bash"),
-                            "linux"
-                        ));
+                            "linux",
+                        );
                         Ok(())
                     } else if s == &Shell::Zsh {
-                        echo!(ensure_eol(
-                            include_str!("../../scripts/zsh_autocomplete.zsh"),
-                            "linux"
-                        ));
+                        echo!(format!("MOBIUS_KEY_BINDING={}", env_val));
+                        fix_eof(include_str!("../../scripts/zsh_autocomplete.zsh"), "linux");
                         Ok(())
                     } else if s == &Shell::PowerShell {
-                        echo!(ensure_eol(
-                            include_str!("../../scripts/pwsh_autocomplete.ps1"),
-                            "linux"
-                        ));
+                        echo!(format!("$MOBIUS_KEY_BINDING = \"{}\"", env_val));
+                        fix_eof(include_str!("../../scripts/pwsh_autocomplete.ps1"), "linux");
                         Ok(())
                     } else {
                         Err(CommandExecutionError::new("Must specify shell"))
@@ -130,17 +130,16 @@ pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionEr
                 }
             }
             "macos" => {
-                echo!(ensure_eol(
-                    include_str!("../../scripts/zsh_autocomplete.zsh"),
-                    "macos"
-                ));
+                echo!(format!("MOBIUS_KEY_BINDING={}", env_val));
+                fix_eof(include_str!("../../scripts/zsh_autocomplete.zsh"), "macos");
                 Ok(())
             }
             "windows" => {
-                echo!(ensure_eol(
+                echo!(format!("$MOBIUS_KEY_BINDING = \"{}\"", env_val));
+                fix_eof(
                     include_str!("../../scripts/pwsh_autocomplete.ps1"),
-                    "windows"
-                ));
+                    "windows",
+                );
                 Ok(())
             }
             _ => Err(CommandExecutionError::new("Unsupported Platform")),
@@ -149,21 +148,22 @@ pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionEr
     Err(CommandExecutionError::new("invalid command"))
 }
 
-fn ensure_eol(input: &str, platform: &str) -> String {
-    let ret = match platform {
-        "windows" => {
-            if !input.contains("\r\n") {
-                input.replace("\n", "\r\n")
-            } else {
-                input.to_string()
-            }
-        }
-        "macos" | "linux" => input.replace("\r\n", "\n"),
-        _ => panic!("Unsupported platform"),
-    };
-    return ret;
-}
-
 fn default_sys_prompt() -> String {
     String::from("You are a good assistant, the response should be concise.")
+}
+
+fn fix_eof(file_content: &str, os: &str) {
+    match os {
+        "linux" | "macos" => {
+            echo!(file_content.replace("\r\n", "\n"));
+        }
+        "windows" => {
+            if !file_content.contains("\r\n") {
+                echo!(file_content.replace("\n", "\r\n"));
+            } else {
+                echo!(file_content.to_string());
+            }
+        }
+        _ => panic!("Unsupported platform"),
+    }
 }

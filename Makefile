@@ -1,9 +1,9 @@
 SHELL:=bash
 DOCKER:=docker
-.PHONY=build docker-build docker-run
+.PHONY=clean docker-build docker-run
 
-build:
-	cargo build
+clean:
+	rm -rf ./target
 
 docker-build:
 	mkdir -p ./target/

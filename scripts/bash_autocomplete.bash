@@ -61,5 +61,10 @@ Let's do this step by step. \
   fi
 }
 
-# Bind Ctrl+/ key to our custom function
-bind -x '"\C-_": _mobius_completer'
+# Bind key to our custom function based on MOBIUS_KEY_BINDING env var
+# Default is Ctrl+/ (\C-_), alternative is Alt+/ (\e/)
+if [[ "${MOBIUS_KEY_BINDING}" == "ALT_SLASH" ]]; then
+  bind -x '"\e/": _mobius_completer'
+else
+  bind -x '"\C-_": _mobius_completer'
+fi
