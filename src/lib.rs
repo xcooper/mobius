@@ -5,6 +5,7 @@ pub mod command;
 pub mod config;
 pub mod llm;
 pub mod model;
+pub mod thread;
 
 macro_rules! echo {
     ($arg:expr) => {
