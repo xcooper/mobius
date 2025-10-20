@@ -30,10 +30,6 @@ pub fn allocate_thread(thread_id: &str) -> Result<Box<dyn Thread>> {
     Ok(Box::from(new_thread))
 }
 
-pub fn destroy_thread(thread: Box<dyn Thread>) {
-    todo!()
-}
-
 struct FileBasedThread {
     thread_id: String,
     thread_file: PathBuf,
