@@ -14,6 +14,15 @@ pub enum Provider {
     Gemini,
 }
 
+impl Provider {
+    pub fn to_rig_provider(&self) -> &str {
+        match self {
+            Provider::OpenAI => "openai",
+            Provider::Gemini => "gemini",
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, ValueEnum, PartialEq)]
 pub enum HotKey {
     CtrlSlash,
