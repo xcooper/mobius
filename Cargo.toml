@@ -4,15 +4,15 @@ version = "0.1.2"
 edition = "2021"
 
 [dependencies]
-clap = { version = "4.5.30", features = ["derive"] }
-serde = { version = "1.0.218", features = ["derive"] }
+clap = { version = "4.5.54", features = ["derive"] }
+serde = { version = "1.0.228", features = ["derive"] }
 stderrlog = "0.6.0"
-toml = "0.9.6"
-log = "0.4.25"
-tokio = { version = "1.44.1", features = ["full"] }
-async-trait = "0.1.88"
-rig-core = "0.19.0"
-serde_json = "1.0.143"
+toml = "0.9.11"
+log = "0.4.29"
+tokio = { version = "1.49.0", features = ["full"] }
+async-trait = "0.1.89"
+rig-core = "0.28.0"
+serde_json = "1.0.149"
 anyhow = "1.0.100"
 
 [profile.dev]
