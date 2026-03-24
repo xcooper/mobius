@@ -6,17 +6,15 @@ use std::env;
 
 #[tokio::main]
 async fn main() {
-    let mut args = ParsedArgs::parse();
-    if env::var("DEBUG").is_ok() {
-        args.verbose = 3;
+    let args = ParsedArgs::parse();
+    let mut log_lv = log::Level::Info;
+    if env::var("DEBUG").is_ok() || args.verbose > 0 {
+        log_lv = log::Level::Debug;
     }
-    stderrlog::new()
-        .verbosity(args.verbose as usize)
-        .init()
-        .unwrap();
+    simple_logger::init_with_level(log_lv).unwrap();
     match args.command {
         Commands::Init { .. } => {
-            if let Err(e) = do_init(&args) {
+            if let Err(e) = do_init(&args).await {
                 error!("{}", e);
             }
         }

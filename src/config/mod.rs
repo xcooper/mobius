@@ -34,12 +34,12 @@ pub fn default_config() -> Config {
     }
 }
 
-pub fn load_config() -> Result<Config, Error> {
+pub async fn load_config() -> Result<Config, Error> {
     let cfg_path = get_config_path()?;
-    load_config_from(&cfg_path)
+    load_config_from(&cfg_path).await
 }
 
-fn load_config_from(cfg_path: &PathBuf) -> Result<Config, Error> {
+async fn load_config_from(cfg_path: &PathBuf) -> Result<Config, Error> {
     let content = read_to_string(cfg_path)?;
     let toml_parsing: Result<Config, toml::de::Error> = from_str(&content);
     toml_parsing.map_err(|e| Error::new(ErrorKind::InvalidData, e))
@@ -117,8 +117,8 @@ mod tests {
         }
     }
 
-    #[test]
-    fn test_read_write_config() {
+    #[tokio::test]
+    async fn test_read_write_config() {
         let config = Config {
             llm: LLM {
                 provider: Provider::OpenAI,
@@ -131,7 +131,7 @@ mod tests {
         let tmp_cfg_file = env::temp_dir().join("test_read_write_config.toml");
         remove_file(&tmp_cfg_file).ok();
         save_config_to(&tmp_cfg_file, &config).expect("Failed to save config");
-        let loaded_config = load_config_from(&tmp_cfg_file).expect("Failed to load config");
+        let loaded_config = load_config_from(&tmp_cfg_file).await.expect("Failed to load config");
         assert_eq!(config, loaded_config);
     }
 }

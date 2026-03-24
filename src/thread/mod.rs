@@ -128,13 +128,8 @@ mod test {
     use super::*;
     use std::{sync::Arc, thread};
 
-    fn setup_logger() {
-        stderrlog::new().verbosity(3).init().unwrap_or_default();
-    }
-
     #[test]
     fn test_write_then_read_messages() {
-        setup_logger();
         let thread_id = format!("{}", rand::random::<u64>());
         let thread = allocate_thread(&thread_id).unwrap();
         let message = Message::user("test");
@@ -158,7 +153,6 @@ mod test {
 
     #[test]
     fn test_read_empty_file() {
-        setup_logger();
         let thread_id = format!("{}", rand::random::<u64>());
         let thread = allocate_thread(&thread_id).unwrap();
         let messages = thread
@@ -169,7 +163,6 @@ mod test {
 
     #[test]
     fn test_concurrent_writes() {
-        setup_logger();
         const NUM_THREADS: usize = 1000;
         let thread_id_rc = Arc::new(format!("{}", rand::random::<u64>()));
 

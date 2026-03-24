@@ -6,7 +6,7 @@ use crate::{echo, CommandExecutionError};
 use std::env;
 use std::io::{stdin, Read};
 
-pub fn do_init(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
+pub async fn do_init(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
     let cmd = &args.command;
     if let Commands::Init {
         api_key,
@@ -33,7 +33,7 @@ pub fn do_init(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
 
 pub async fn do_chat(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
     let cmd = &args.command;
-    let config = load_config()
+    let config = load_config().await
         .map_err(|e| CommandExecutionError::new(format!("can not load config: {}", e)))?;
     if let Commands::Chat {
         prompt,
@@ -67,7 +67,7 @@ pub async fn do_chat(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
 
 pub async fn do_exec(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
     let cmd = &args.command;
-    let config = load_config()
+    let config = load_config().await
         .map_err(|e| CommandExecutionError::new(format!("can not load config: {}", e)))?;
     if let Commands::Exec {
         prompt,
