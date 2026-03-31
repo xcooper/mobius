@@ -49,7 +49,7 @@ them. Only respond with valid commands OR PowerShell built-in commands. Do not w
 format, or explain - output only the command(s) themselves.
 Let's do this step by step.
 "@
-        $aiResponse = & mobius exec --prompt "$afterAi" --system-prompt $systemPrompt
+        $aiResponse = & mobius chat --prompt "$afterAi" --system-prompt $systemPrompt
         $trimmedAiResponse = $aiResponse -replace "(?s)^```[a-zA-Z0-9]*\\n?", ''
         $trimmedAiResponse = $trimmedAiResponse -replace "```$", ''
         

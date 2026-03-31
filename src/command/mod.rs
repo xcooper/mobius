@@ -24,7 +24,7 @@ pub async fn do_init(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
         if let Some(key) = api_key {
             new_config.llm.api_key = Some(key.clone());
         }
-        if let Err(_) = save_config(&new_config) {
+        if save_config(&new_config).is_err() {
             return Err(CommandExecutionError::new("Failed to save config"));
         }
     }
@@ -33,7 +33,8 @@ pub async fn do_init(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
 
 pub async fn do_chat(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
     let cmd = &args.command;
-    let config = load_config().await
+    let config = load_config()
+        .await
         .map_err(|e| CommandExecutionError::new(format!("can not load config: {}", e)))?;
     if let Commands::Chat {
         prompt,
@@ -48,47 +49,9 @@ pub async fn do_chat(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
                 .map_err(|_| CommandExecutionError::new("can not read stdin"))?;
         }
         let llm = get_llm(&config);
-        return match llm
-            .chat(
-                system_prompt.as_ref().map_or(&default_sys_prompt(), |v| v),
-                vec![&user_prompt],
-            )
-            .await
-        {
-            Ok(o) => {
-                echo!(o);
-                Ok(())
-            }
-            Err(e) => Err(CommandExecutionError::new(format!("{:?}", e))),
-        };
-    }
-    Err(CommandExecutionError::new("invalid command"))
-}
-
-pub async fn do_exec(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
-    let cmd = &args.command;
-    let config = load_config().await
-        .map_err(|e| CommandExecutionError::new(format!("can not load config: {}", e)))?;
-    if let Commands::Exec {
-        prompt,
-        system_prompt,
-    } = cmd
-    {
-        let mut user_prompt = String::from(prompt);
-        if prompt == "-" {
-            let mut stdin = stdin().lock();
-            stdin
-                .read_to_string(&mut user_prompt)
-                .map_err(|_| CommandExecutionError::new("can not read stdin"))?;
-        }
-        let llm = get_llm(&config);
-        return match llm
-            .exec(
-                system_prompt.as_ref().map_or(&default_sys_prompt(), |v| v),
-                vec![&user_prompt],
-            )
-            .await
-        {
+        let default_sys = default_sys_prompt();
+        let sys = system_prompt.as_deref().unwrap_or(&default_sys);
+        return match llm.chat(sys, vec![&user_prompt]).await {
             Ok(o) => {
                 echo!(o);
                 Ok(())
@@ -149,7 +112,10 @@ pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionEr
 }
 
 fn default_sys_prompt() -> String {
-    String::from("You are a good assistant, the response should be concise.")
+    String::from(
+        "You are a terminal command expert.
+        ",
+    )
 }
 
 fn fix_eof(file_content: &str, os: &str) {

@@ -36,7 +36,7 @@ _mobius_completer() {
   if [[ "$line_before_cursor" == *ai:* ]]; then
     local before_ai=${line_before_cursor##ai:*}
     local after_ai=${line_before_cursor##*ai:}
-  local ai_resp=$(mobius exec \
+  local ai_resp=$(mobius chat \
     --prompt "$after_ai" \
     --system-prompt "You are a Zsh command assistant. \
 Given a user request, generate one or more shell commands that fulfill the requirement. \

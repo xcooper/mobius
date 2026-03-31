@@ -1,7 +1,6 @@
 use crate::model::HotKey;
 use crate::model::Provider;
 use crate::model::Shell;
-use clap::command;
 use clap::ArgAction;
 use clap::Parser;
 use clap::Subcommand;
@@ -36,17 +35,6 @@ pub enum Commands {
         about = "Sends the prompt along with the stdin to AI"
     )]
     Chat {
-        #[arg(short, long, help = "The prompt, use '-' for reading from stdin")]
-        prompt: String,
-        #[arg(short, long, help = "The system prompt")]
-        system_prompt: Option<String>,
-    },
-    #[command(
-        arg_required_else_help = true,
-        hide = true,
-        about = "A special command for the CLI auto-complete function"
-    )]
-    Exec {
         #[arg(short, long, help = "The prompt, use '-' for reading from stdin")]
         prompt: String,
         #[arg(short, long, help = "The system prompt")]

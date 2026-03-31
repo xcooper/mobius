@@ -42,7 +42,7 @@ impl CheckCmdExist {
                 ])
                 .output()
                 .map(|out| out.status.success())
-                .map_err(|e| CommandExecutionError::new(e)),
+                .map_err(CommandExecutionError::new),
         }
     }
 }

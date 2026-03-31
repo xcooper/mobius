@@ -42,7 +42,7 @@ _mobius_completer() {
     local after_ai="${line_before_cursor#*ai:}"
 
     # Run the mobius command with the text after "ai:"
-    local ai_resp=$(mobius exec \
+    local ai_resp=$(mobius chat \
       --prompt "$after_ai" \
       --system-prompt "You are a Bash command assistant. \
 Given a user request, generate one or more shell commands that fulfill the requirement. \

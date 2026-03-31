@@ -20,12 +20,6 @@ pub trait LLM {
         system_prompt: &str,
         user_prompts: Vec<&str>,
     ) -> Result<String, Box<dyn Error>>;
-
-    async fn exec(
-        &self,
-        system_prompt: &str,
-        user_prompts: Vec<&str>,
-    ) -> Result<String, Box<dyn Error>>;
 }
 
 struct GenericLLM<'a> {
@@ -49,42 +43,6 @@ impl LLM for GenericLLM<'_> {
                 client
                     .agent(&llm.model)
                     .preamble(system_prompt)
-                    .temperature(llm.default_temperature)
-                    .additional_params(serde_json::json!({}))
-                    .build()
-                    .chat(last_user_prompt, Vec::<Message>::new())
-                    .await
-            }
-            Provider::Gemini => {
-                let client: gemini::Client = gemini::Client::new(&api_key)?;
-                client
-                    .agent(&llm.model)
-                    .preamble(system_prompt)
-                    .temperature(llm.default_temperature)
-                    .additional_params(serde_json::json!({}))
-                    .build()
-                    .chat(last_user_prompt, Vec::<Message>::new())
-                    .await
-            }
-        };
-        resp.map_err(|e| Box::from(e))
-    }
-
-    async fn exec(
-        &self,
-        system_prompt: &str,
-        user_prompts: Vec<&str>,
-    ) -> Result<String, Box<dyn Error>> {
-        let llm = &self.config.llm;
-        let api_key = llm.api_key.clone().unwrap();
-        let prompt_histories = split_prompt_and_history(user_prompts);
-        let last_user_prompt = prompt_histories.0.unwrap();
-        let resp = match llm.provider {
-            Provider::OpenAI => {
-                let client: openai::Client = openai::Client::new(&api_key)?;
-                client
-                    .agent(&llm.model)
-                    .preamble(system_prompt)
                     .tool(CheckCmdExist)
                     .temperature(llm.default_temperature)
                     .additional_params(serde_json::json!({}))
@@ -105,10 +63,10 @@ impl LLM for GenericLLM<'_> {
                     .await
             }
         };
-        resp.map_err(|e| Box::from(e))
+        resp.map_err(Box::from)
     }
 }
 
 pub fn get_llm(config: &Config) -> Box<dyn LLM + '_> {
-    Box::new(GenericLLM { config: config })
+    Box::new(GenericLLM { config })
 }

@@ -28,3 +28,10 @@ impl HotKey {
         }
     }
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum OS {
+    MacOS,
+    Linux,
+    Windows,
+}
