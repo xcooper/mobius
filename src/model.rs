@@ -8,6 +8,16 @@ pub enum Shell {
     PowerShell,
 }
 
+impl From<Shell> for &str {
+    fn from(value: Shell) -> Self {
+        match value {
+            Shell::Zsh => "ZSH",
+            Shell::Bash => "BASH",
+            Shell::PowerShell => "PowerShell",
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, ValueEnum, PartialEq)]
 pub enum Provider {
     OpenAI,
@@ -34,4 +44,14 @@ pub enum OS {
     MacOS,
     Linux,
     Windows,
+}
+
+impl From<OS> for &str {
+    fn from(val: OS) -> Self {
+        match val {
+            OS::MacOS => "MacOS",
+            OS::Linux => "Linux",
+            OS::Windows => "Windows",
+        }
+    }
 }

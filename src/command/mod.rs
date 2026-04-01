@@ -1,7 +1,8 @@
 use crate::args_parser::{Commands, ParsedArgs};
 use crate::config::{default_config, load_config, save_config};
 use crate::llm::get_llm;
-use crate::model::{HotKey, Shell};
+use crate::model::{HotKey, Shell, OS};
+use crate::utils::local_env::{get_cwd, get_os, get_shell};
 use crate::{echo, CommandExecutionError};
 use std::env;
 use std::io::{stdin, Read};
@@ -112,9 +113,12 @@ pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionEr
 }
 
 fn default_sys_prompt() -> String {
-    String::from(
-        "You are a terminal command expert.
-        ",
+    let os_str: &str = get_os().map(OS::into).unwrap_or("unknown");
+    let shell_str: &str = get_shell().map(Shell::into).unwrap_or("unknown");
+    let cwd_str = get_cwd().map(|p| format!("{:?}", p)).unwrap();
+    format!(
+        "You are a terminal command expert. The OS is {}. The shell is {}. The current directory is {}.",
+        os_str, shell_str, cwd_str
     )
 }
 

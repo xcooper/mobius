@@ -3,8 +3,10 @@ use anyhow::{anyhow, Result};
 use crate::model::{Shell, OS};
 use std::env::consts;
 use std::env::var;
+use std::env::current_dir;
+use std::path::PathBuf;
 
-fn get_os() -> Result<OS> {
+pub fn get_os() -> Result<OS> {
     let os_str = consts::OS;
     match os_str {
         "windows" => Result::Ok(OS::Windows),
@@ -14,7 +16,7 @@ fn get_os() -> Result<OS> {
     }
 }
 
-fn get_shell() -> Result<Shell> {
+pub fn get_shell() -> Result<Shell> {
     let os = get_os()?;
     if os == OS::Windows {
         if let Ok(val) = var("ShellId") {
@@ -22,26 +24,25 @@ fn get_shell() -> Result<Shell> {
                 return Ok(Shell::PowerShell);
             }
         }
-    } else {
-        if let Ok(val) = var("SHELL") {
-            let lower = val.to_lowercase();
-            if lower.contains("zsh") {
-                return Ok(Shell::Zsh);
-            } else if lower.contains("bash") {
-                return Ok(Shell::Bash);
-            }
+    } else if let Ok(val) = var("SHELL") {
+        let lower = val.to_lowercase();
+        if lower.contains("zsh") {
+            return Ok(Shell::Zsh);
+        } else if lower.contains("bash") {
+            return Ok(Shell::Bash);
         }
     }
     Err(anyhow!("Unable to detect shell"))
 }
 
+pub fn get_cwd() -> Result<PathBuf> {
+    current_dir().map_err(|e| anyhow!("Unable to get current working directory: {}", e))
+}
+
 #[cfg(test)]
 mod test {
-    use super::get_os;
-    use crate::{
-        model::{Shell, OS},
-        utils::get_shell,
-    };
+    use super::{get_cwd, get_os, get_shell};
+    use crate::model::{Shell, OS};
 
     #[test]
     fn test_get_os() {
@@ -51,5 +52,11 @@ mod test {
     #[test]
     fn test_get_shell() {
         assert!([Shell::Bash, Shell::Zsh, Shell::PowerShell].contains(&get_shell().unwrap()));
+    }
+
+    #[test]
+    fn test_get_cwd() {
+        let cwd = get_cwd().unwrap();
+        assert!(cwd.is_absolute());
     }
 }
