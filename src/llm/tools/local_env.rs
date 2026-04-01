@@ -19,7 +19,7 @@ pub struct CheckCmdExistResp {
     result: HashMap<String, bool>,
 }
 
-pub(super) struct CheckCmdExist;
+pub struct CheckCmdExist;
 
 impl CheckCmdExist {
     fn check_single_cmd(&self, cmd: &str, shell: &Shell) -> Result<bool, CommandExecutionError> {

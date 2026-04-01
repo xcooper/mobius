@@ -1,5 +1,6 @@
 mod internal;
 mod tools;
+mod utils;
 
 use crate::model::Provider;
 use rig::client::CompletionClient;
