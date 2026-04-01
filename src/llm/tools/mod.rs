@@ -1,3 +1,3 @@
-mod local_env;
+mod shell;
 
-pub use local_env::CheckCmdExist;
+pub use shell::CheckCmdExist;
