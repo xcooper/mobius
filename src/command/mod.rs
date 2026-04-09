@@ -6,6 +6,7 @@ use crate::utils::local_env::{get_cwd, get_os, get_shell};
 use crate::{echo, CommandExecutionError};
 use std::env;
 use std::io::{stdin, Read};
+use std::rc::Rc;
 
 pub async fn do_init(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
     let cmd = &args.command;
@@ -51,7 +52,7 @@ pub async fn do_chat(args: &ParsedArgs) -> Result<(), CommandExecutionError> {
         }
         let llm = get_llm(&config);
         let default_sys = default_sys_prompt();
-        let sys = system_prompt.as_deref().unwrap_or(&default_sys);
+        let sys = system_prompt.as_deref().unwrap_or_else(default_sys_prompt);
         return match llm.chat(sys, vec![&user_prompt]).await {
             Ok(o) => {
                 echo!(o);
@@ -112,14 +113,17 @@ pub async fn do_autocomplete(args: &ParsedArgs) -> Result<(), CommandExecutionEr
     Err(CommandExecutionError::new("invalid command"))
 }
 
-fn default_sys_prompt() -> String {
+fn default_sys_prompt() -> Box<String> {
     let os_str: &str = get_os().map(OS::into).unwrap_or("unknown");
     let shell_str: &str = get_shell().map(Shell::into).unwrap_or("unknown");
     let cwd_str = get_cwd().map(|p| format!("{:?}", p)).unwrap();
-    format!(
-        "You are a terminal command expert. The OS is {}. The shell is {}. The current directory is {}.",
-        os_str, shell_str, cwd_str
-    )
+    let def_sys = format!(
+        "You are a {} command expert on {}. The current directory is {}.",
+        shell_str,
+        os_str,
+        cwd_str,
+    );
+    Box::new(def_sys)
 }
 
 fn fix_eof(file_content: &str, os: &str) {
